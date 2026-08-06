@@ -140,6 +140,7 @@
 
     <div class="nav-actions">
       <div class="dolar-badge" id="dolar-badge">💵 $1 = ₺38.50</div>
+      <button class="btn btn-orange" onclick="openSettingsModal()">⚙️ Ayarlar</button>
       <button class="btn btn-wa" onclick="openModal('wa')">📱 WhatsApp</button>
       <button class="btn btn-green" onclick="dlExcel()">📥 Excel İndir</button>
       <button class="btn btn-blue" onclick="sendMail()">📧 E-Posta Gönder</button>
@@ -311,61 +312,78 @@
 
     <div style="background:#111827;border:1px solid #1e293b;border-radius:10px;overflow:hidden;margin-bottom:14px;font-size:.8rem">
       <div style="background:#080f1d;padding:8px 12px;font-weight:700;color:#f1f5f9;font-size:.75rem">1. İTHALAT GİDERLERİ (ÇİN -> TR LİMAN TESLİM)</div>
-      <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;justify-content:space-between">
-          <span style="color:#94a3b8">Birim FOB Alış (Çin):</span>
-          <strong id="calc-fob-try">0.00 ₺</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="color:#94a3b8">Uluslararası Navlun / Kargo (Tahmini):</span>
-          <strong id="calc-freight">0.00 ₺</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="color:#94a3b8">Gümrük Vergisi (%30):</span>
-          <strong id="calc-tax-duty" style="color:#fb923c">0.00 ₺</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="color:#94a3b8">İthalat KDV (%20):</span>
-          <strong id="calc-tax-vat" style="color:#fb923c">0.00 ₺</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="color:#94a3b8">Müşavirlik, Ardiye & Antrepo:</span>
-          <strong id="calc-clearance">40.00 ₺</strong>
-        </div>
-        <div style="border-top:1px dashed #1e293b;padding-top:6px;display:flex;justify-content:space-between;font-weight:700">
-          <span style="color:#f1f5f9">Toplam Landed Maliyet (Gümrük Kapı Teslim):</span>
-          <strong style="color:#fbbf24" id="calc-total-landed">0.00 ₺</strong>
-        </div>
+      <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px" id="calc-import-list">
+        <!-- populated dynamically in js -->
       </div>
 
-      <div style="background:#080f1d;padding:8px 12px;font-weight:700;color:#f1f5f9;font-size:.75rem;border-top:1px solid #1e293b">2. TÜRKİYE PAZARYERİ GİDERLERİ & SATIŞ</div>
-      <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;justify-content:space-between">
-          <span style="color:#94a3b8">Hedef Türkiye Satış Fiyatı:</span>
-          <strong id="calc-selling">0.00 ₺</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="color:#94a3b8">Trendyol Komisyonu (%18):</span>
-          <strong id="calc-comm" style="color:#f87171">0.00 ₺</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <span style="color:#94a3b8">Yurtiçi Müşteri Kargo Bedeli:</span>
-          <strong id="calc-local-cargo" style="color:#f87171">45.00 ₺</strong>
-        </div>
-      </div>
-
-      <div style="background:rgba(52,211,153,.08);border-top:1px solid #1e293b;padding:12px;display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="color:#34d399;font-weight:800;font-size:.9rem" id="calc-net-profit">Birim Net Kâr: 0.00 ₺</div>
-          <div style="font-size:.7rem;color:#64748b;margin-top:1px" id="calc-margin">Net Kâr Marjı: %00</div>
-        </div>
-        <div style="text-align:right">
-          <span class="badge b-green" id="calc-roi">ROI: %00</span>
-        </div>
+      <div style="background:#080f1d;padding:8px 12px;font-weight:700;color:#f1f5f9;font-size:.75rem;border-top:1px solid #1e293b">2. D DİĞER PAZARYERLERİ SATIŞ & KÂR KARŞILAŞTIRMASI</div>
+      <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px" id="calc-marketplace-list">
+        <!-- populated dynamically in js -->
       </div>
     </div>
     
     <button class="btn btn-blue" style="width:100%;justify-content:center;padding:10px" onclick="closeModal('calc')">Kapat</button>
+  </div>
+</div>
+
+<!-- FINANCIAL SETTINGS MODAL -->
+<div class="modal-bg" id="m-settings">
+  <div class="modal" style="max-width:550px">
+    <button onclick="closeModal('settings')" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.08);border:none;color:#fff;padding:4px 10px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
+    <h3 style="color:#38bdf8;font-size:1.15rem;margin-bottom:6px">⚙️ İthalat Mevzuatı & Finansal Hesap Ayarları</h3>
+    <p style="font-size:.78rem;color:#64748b;margin-bottom:14px">Mevzuata veya kategorinize göre tüm oranları güncelleyin. Hesaplamalar anında yenilenecektir.</p>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">Gümrük Vergisi (%):</label>
+        <input type="number" id="set-gv" class="inp" min="0" max="100">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">İlave Gümrük Vergisi - İGV (%):</label>
+        <input type="number" id="set-igv" class="inp" min="0" max="100">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">Özel Tüketim Vergisi - ÖTV (%):</label>
+        <input type="number" id="set-otv" class="inp" min="0" max="100">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">TRT Bandrolü (%):</label>
+        <input type="number" id="set-trt" class="inp" min="0" max="100">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">İthalat KDV Oranı (%):</label>
+        <input type="number" id="set-kdv" class="inp" min="0" max="100">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">Sabit Müşavirlik & Ordino (₺/adet):</label>
+        <input type="number" id="set-clearance" class="inp" min="0">
+      </div>
+    </div>
+
+    <h4 style="color:#fbbf24;font-size:.9rem;margin-bottom:8px">Pazaryeri Komisyon Oranları (%)</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">Trendyol Komisyon (%):</label>
+        <input type="number" id="set-comm-ty" class="inp" min="0" max="100">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">Hepsiburada Komisyon (%):</label>
+        <input type="number" id="set-comm-hb" class="inp" min="0" max="100">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">Amazon TR Komisyon (%):</label>
+        <input type="number" id="set-comm-amz" class="inp" min="0" max="100">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">n11 Komisyon (%):</label>
+        <input type="number" id="set-comm-n11" class="inp" min="0" max="100">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-green" style="flex:1;justify-content:center" onclick="saveFinancialSettings()">💾 Ayarları Kaydet & Yenile</button>
+      <button class="btn btn-blue" style="flex:0.5;justify-content:center" onclick="closeModal('settings')">Kapat</button>
+    </div>
   </div>
 </div>
 
@@ -374,6 +392,7 @@
 // CONFIG & STATE
 // ============================================================
 const STORAGE_KEY = "tradepulse_v3";
+const SETTINGS_KEY = "tradepulse_fin_v1";
 const DAILY_LIMIT = 100;
 let USD_RATE = 38.50;  // Sunucudan gerçek TCMB kuru alınacak
 
@@ -384,10 +403,33 @@ let archiveList = [];
 let archiveSet = new Set();
 let todayKey = new Date().toDateString();
 
+// İthalat Mevzuatı ve Komisyon Oranları
+let FINANCIAL_SETTINGS = {
+  gvRate: 30,         // Gümrük Vergisi %30
+  igvRate: 20,        // İlave Gümrük Vergisi (İGV) %20
+  otvRate: 6.7,       // Özel Tüketim Vergisi (ÖTV) %6.7
+  trtRate: 2,         // TRT Bandrolü %2
+  kdvRate: 20,        // KDV %20
+  fixedClearance: 40, // Müşavirlik, Ardiye vb. (Birim başı 40 TL)
+  localCargo: 45,     // Yurtiçi kargo 45 TL
+  commTrendyol: 18,   // Trendyol %18
+  commHepsiburada: 17,// Hepsiburada %17
+  commAmazon: 15,     // Amazon %15
+  commN11: 15         // n11 %15
+};
+
 // ============================================================
 // LOAD PERSISTENT STATE — Sunucu API + localStorage fallback
 // ============================================================
 async function loadState() {
+  // Finansal ayarları yükle
+  try {
+    const savedSet = localStorage.getItem(SETTINGS_KEY);
+    if (savedSet) {
+      FINANCIAL_SETTINGS = Object.assign(FINANCIAL_SETTINGS, JSON.parse(savedSet));
+    }
+  } catch(e) {}
+
   // 1) Sunucu tarafı state'i dene
   try {
     const r = await fetch('/api/state');
@@ -567,11 +609,33 @@ const DB = [
 // AI SCORING ENGINE (6 Factor Analysis)
 // ============================================================
 function calcAI(item) {
-  const landed = Math.round((item.fob * USD_RATE * 1.5) + 40);
-  const commission = Math.round(item.tr * 0.18);
-  const cargo = 45;
+  const fobTry = item.fob * USD_RATE;
+  const estFreight = fobTry * 0.08; 
+  const cifValue = fobTry + estFreight;
+  
+  // 1) Gümrük Vergisi
+  const gv = cifValue * (FINANCIAL_SETTINGS.gvRate / 100);
+  // 2) İlave Gümrük Vergisi (İGV)
+  const igv = cifValue * (FINANCIAL_SETTINGS.igvRate / 100);
+  // 3) TRT Bandrolü
+  const trt = cifValue * (FINANCIAL_SETTINGS.trtRate / 100);
+  // 4) Özel Tüketim Vergisi (ÖTV)
+  const otvBase = cifValue + gv + igv + trt;
+  const otv = otvBase * (FINANCIAL_SETTINGS.otvRate / 100);
+  // 5) KDV
+  const kdvBase = otvBase + otv;
+  const kdv = kdvBase * (FINANCIAL_SETTINGS.kdvRate / 100);
+  
+  // Toplam Landed Maliyet (Gümrük kapı teslim)
+  const landed = Math.round(cifValue + gv + igv + trt + otv + kdv + FINANCIAL_SETTINGS.fixedClearance);
+  
+  // Trendyol komisyon ve yurtiçi kargo
+  const commission = Math.round(item.tr * (FINANCIAL_SETTINGS.commTrendyol / 100));
+  const cargo = FINANCIAL_SETTINGS.localCargo;
+  
   const netProfit = item.tr - landed - commission - cargo;
   const margin = Math.round((netProfit / item.tr) * 100);
+  const roi = Math.round((netProfit / landed) * 100);
 
   // Factor 1: Net Margin (30 pts)
   let f1 = 0;
@@ -581,7 +645,6 @@ function calcAI(item) {
   else if (margin >= 15) f1 = 8;
 
   // Factor 2: ROI (20 pts)
-  const roi = netProfit / landed * 100;
   let f2 = 0;
   if (roi >= 200) f2 = 20;
   else if (roi >= 150) f2 = 16;
@@ -598,12 +661,12 @@ function calcAI(item) {
   const viralCats = ["💄 Güzellik & Sağlık","🏋️ Fitness","🐾 Pet Tech","👶 Bebek & Çocuk"];
   let f5 = viralCats.includes(item.cat) ? 10 : 6;
 
-  // Factor 6: Competition (10 pts) — lower fob = less competition generally
+  // Factor 6: Competition (10 pts)
   let f6 = item.fob < 8 ? 10 : item.fob < 15 ? 7 : 4;
 
   const total = Math.min(100, f1 + f2 + f3 + f4 + f5 + f6);
   const label = total >= 92 ? "🔥 Efsane" : total >= 80 ? "⭐ Mükemmel" : total >= 65 ? "✅ Çok İyi" : "📊 İyi";
-  return { score: total, label, netProfit, margin, landed, commission, cargo, roi: Math.round(roi) };
+  return { score: total, label, netProfit, margin, landed, commission, cargo, roi };
 }
 
 function tiktokScore(item) {
@@ -1060,38 +1123,142 @@ function openLedger(id) {
   if (!p) p = scanPool.find(x => x.id === id);
   if (!p) return;
 
-  const landed = Math.round((p.fob * USD_RATE * 1.5) + 40);
-  const commission = Math.round(p.tr * 0.18);
-  const cargo = 45;
-  const netProfit = p.tr - landed - commission - cargo;
-  const margin = Math.round((netProfit / p.tr) * 100);
-  const roi = Math.round((netProfit / landed) * 100);
-
+  const ai = calcAI(p);
   const fobTry = p.fob * USD_RATE;
-  // Itemize the 1.5 Landed Cost multiplier
   const estFreight = fobTry * 0.08; 
-  const baseForDuty = fobTry + estFreight;
-  const customsDuty = baseForDuty * 0.30;
-  const baseForVat = baseForDuty + customsDuty;
-  const vat = baseForVat * 0.20;
+  const cifValue = fobTry + estFreight;
+  const gv = cifValue * (FINANCIAL_SETTINGS.gvRate / 100);
+  const igv = cifValue * (FINANCIAL_SETTINGS.igvRate / 100);
+  const trt = cifValue * (FINANCIAL_SETTINGS.trtRate / 100);
+  const otvBase = cifValue + gv + igv + trt;
+  const otv = otvBase * (FINANCIAL_SETTINGS.otvRate / 100);
+  const kdvBase = otvBase + otv;
+  const kdv = kdvBase * (FINANCIAL_SETTINGS.kdvRate / 100);
 
   document.getElementById("calc-prod-name").innerHTML = `<span class="badge b-purple">${p.cat}</span> <strong>${p.title}</strong>`;
   document.getElementById("calc-usd-rate").textContent = `₺${USD_RATE.toFixed(4)} (Resmi TCMB Güncel Kuru)`;
-  document.getElementById("calc-gtip").textContent = `${p.gtip || 'Bilinmiyor'} (CE, RoHS Gümrük Beyannameli)`;
-  
-  document.getElementById("calc-fob-try").textContent = `$${p.fob.toFixed(2)} (₺${fobTry.toFixed(2)})`;
-  document.getElementById("calc-freight").textContent = `₺${estFreight.toFixed(2)} (Hacimsel Ağırlık / Desi: ${p.fbaW || '0.8 desi'})`;
-  document.getElementById("calc-tax-duty").textContent = `₺${customsDuty.toFixed(2)}`;
-  document.getElementById("calc-tax-vat").textContent = `₺${vat.toFixed(2)}`;
-  document.getElementById("calc-total-landed").textContent = `₺${landed.toLocaleString('tr-TR')} (Gümrük Vergileri ve Masraflar Dahil)`;
+  document.getElementById("calc-gtip").textContent = `${p.gtip || 'Bilinmiyor'} (CE, RoHS Uyumlu)`;
 
-  document.getElementById("calc-selling").textContent = `₺${p.tr.toLocaleString('tr-TR')} (Trendyol Canlı Satış Değeri)`;
-  document.getElementById("calc-comm").textContent = `₺${commission.toLocaleString('tr-TR')} (Pazaryeri Komisyonu %18)`;
-  document.getElementById("calc-net-profit").textContent = `Birim Net Kâr: ₺${netProfit.toLocaleString('tr-TR')}`;
-  document.getElementById("calc-margin").textContent = `Net Kâr Marjı: %${margin}`;
-  document.getElementById("calc-roi").textContent = `Yatırım Getirisi (ROI): %${roi}`;
+  const importHtml = `
+    <div style="display:flex;justify-content:space-between">
+      <span style="color:#94a3b8">Birim FOB Alış (Çin):</span>
+      <strong>$${p.fob.toFixed(2)} (₺${fobTry.toFixed(2)})</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      <span style="color:#94a3b8">Uluslararası Navlun / Kargo:</span>
+      <strong>₺${estFreight.toFixed(2)} (Desi: ${p.fbaW || '0.8 desi'})</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      <span style="color:#94a3b8">Gümrük Vergisi (%${FINANCIAL_SETTINGS.gvRate}):</span>
+      <strong style="color:#fb923c">₺${gv.toFixed(2)}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      <span style="color:#94a3b8">İlave Gümrük Vergisi - İGV (%${FINANCIAL_SETTINGS.igvRate}):</span>
+      <strong style="color:#fb923c">₺${igv.toFixed(2)}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      <span style="color:#94a3b8">TRT Bandrolü (%${FINANCIAL_SETTINGS.trtRate}):</span>
+      <strong style="color:#fb923c">₺${trt.toFixed(2)}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      <span style="color:#94a3b8">Özel Tüketim Vergisi - ÖTV (%${FINANCIAL_SETTINGS.otvRate}):</span>
+      <strong style="color:#fb923c">₺${otv.toFixed(2)}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      <span style="color:#94a3b8">İthalat KDV (%${FINANCIAL_SETTINGS.kdvRate}):</span>
+      <strong style="color:#fb923c">₺${kdv.toFixed(2)}</strong>
+    </div>
+    <div style="display:flex;justify-content:space-between">
+      <span style="color:#94a3b8">Müşavirlik & Antrepo Payı:</span>
+      <strong>₺${FINANCIAL_SETTINGS.fixedClearance.toFixed(2)}</strong>
+    </div>
+    <div style="border-top:1px dashed #1e293b;padding-top:6px;display:flex;justify-content:space-between;font-weight:700">
+      <span style="color:#f1f5f9">Toplam Landed Maliyet (Gümrük Kapı Teslim):</span>
+      <strong style="color:#fbbf24">₺${ai.landed.toLocaleString('tr-TR')}</strong>
+    </div>
+  `;
+  document.getElementById("calc-import-list").innerHTML = importHtml;
+
+  const markets = p.marketplaces || {
+    trendyol: Math.round(p.tr),
+    hepsiburada: Math.round(p.tr * 0.98),
+    amazon: Math.round(p.tr * 0.95),
+    n11: Math.round(p.tr * 0.97)
+  };
+
+  const pTrendyol = Math.round(markets.trendyol - ai.landed - (markets.trendyol * (FINANCIAL_SETTINGS.commTrendyol / 100)) - FINANCIAL_SETTINGS.localCargo);
+  const pHepsiburada = Math.round(markets.hepsiburada - ai.landed - (markets.hepsiburada * (FINANCIAL_SETTINGS.commHepsiburada / 100)) - FINANCIAL_SETTINGS.localCargo);
+  const pAmazon = Math.round(markets.amazon - ai.landed - (markets.amazon * (FINANCIAL_SETTINGS.commAmazon / 100)) - FINANCIAL_SETTINGS.localCargo);
+  const pN11 = Math.round(markets.n11 - ai.landed - (markets.n11 * (FINANCIAL_SETTINGS.commN11 / 100)) - FINANCIAL_SETTINGS.localCargo);
+
+  const mTrendyol = Math.round((pTrendyol / markets.trendyol) * 100);
+  const mHepsiburada = Math.round((pHepsiburada / markets.hepsiburada) * 100);
+  const mAmazon = Math.round((pAmazon / markets.amazon) * 100);
+  const mN11 = Math.round((pN11 / markets.n11) * 100);
+
+  const marketHtml = `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid #1e293b">
+      <span style="font-weight:700;color:#fbbf24">🛍️ Trendyol:</span>
+      <span>Fiyat: <strong>₺${markets.trendyol.toLocaleString()}</strong> | Net Kâr: <strong style="color:#34d399">₺${pTrendyol} (%${mTrendyol})</strong></span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid #1e293b">
+      <span style="font-weight:700;color:#fbbf24">🛍️ Hepsiburada:</span>
+      <span>Fiyat: <strong>₺${markets.hepsiburada.toLocaleString()}</strong> | Net Kâr: <strong style="color:#34d399">₺${pHepsiburada} (%${mHepsiburada})</strong></span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid #1e293b">
+      <span style="font-weight:700;color:#fbbf24">🛍️ Amazon TR:</span>
+      <span>Fiyat: <strong>₺${markets.amazon.toLocaleString()}</strong> | Net Kâr: <strong style="color:#34d399">₺${pAmazon} (%${mAmazon})</strong></span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;color:#fbbf24">🛍️ n11:</span>
+      <span>Fiyat: <strong>₺${markets.n11.toLocaleString()}</strong> | Net Kâr: <strong style="color:#34d399">₺${pN11} (%${mN11})</strong></span>
+    </div>
+  `;
+  document.getElementById("calc-marketplace-list").innerHTML = marketHtml;
 
   openModal('calc');
+}
+
+function openSettingsModal() {
+  document.getElementById("set-gv").value = FINANCIAL_SETTINGS.gvRate;
+  document.getElementById("set-igv").value = FINANCIAL_SETTINGS.igvRate;
+  document.getElementById("set-otv").value = FINANCIAL_SETTINGS.otvRate;
+  document.getElementById("set-trt").value = FINANCIAL_SETTINGS.trtRate;
+  document.getElementById("set-kdv").value = FINANCIAL_SETTINGS.kdvRate;
+  document.getElementById("set-clearance").value = FINANCIAL_SETTINGS.fixedClearance;
+  document.getElementById("set-comm-ty").value = FINANCIAL_SETTINGS.commTrendyol;
+  document.getElementById("set-comm-hb").value = FINANCIAL_SETTINGS.commHepsiburada;
+  document.getElementById("set-comm-amz").value = FINANCIAL_SETTINGS.commAmazon;
+  document.getElementById("set-comm-n11").value = FINANCIAL_SETTINGS.commN11;
+  openModal('settings');
+}
+
+function saveFinancialSettings() {
+  FINANCIAL_SETTINGS.gvRate = parseFloat(document.getElementById("set-gv").value) || 0;
+  FINANCIAL_SETTINGS.igvRate = parseFloat(document.getElementById("set-igv").value) || 0;
+  FINANCIAL_SETTINGS.otvRate = parseFloat(document.getElementById("set-otv").value) || 0;
+  FINANCIAL_SETTINGS.trtRate = parseFloat(document.getElementById("set-trt").value) || 0;
+  FINANCIAL_SETTINGS.kdvRate = parseFloat(document.getElementById("set-kdv").value) || 0;
+  FINANCIAL_SETTINGS.fixedClearance = parseFloat(document.getElementById("set-clearance").value) || 0;
+  FINANCIAL_SETTINGS.commTrendyol = parseFloat(document.getElementById("set-comm-ty").value) || 0;
+  FINANCIAL_SETTINGS.commHepsiburada = parseFloat(document.getElementById("set-comm-hb").value) || 0;
+  FINANCIAL_SETTINGS.commAmazon = parseFloat(document.getElementById("set-comm-amz").value) || 0;
+  FINANCIAL_SETTINGS.commN11 = parseFloat(document.getElementById("set-comm-n11").value) || 0;
+
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(FINANCIAL_SETTINGS));
+  
+  // Recalculate and refresh views
+  archiveList.forEach(p => {
+    const ai = calcAI(p);
+    Object.assign(p, ai);
+  });
+  
+  renderArchive();
+  updateStats();
+  renderTop10();
+  
+  closeModal('settings');
+  alert("✅ Finansal Hesaplama Ayarları Kaydedildi ve Tüm Tablolar Güncellendi!");
 }
 
 function copyRfq() {
