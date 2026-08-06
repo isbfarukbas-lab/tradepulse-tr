@@ -546,6 +546,77 @@ function fbaWeight(item) {
 // ============================================================
 // SCAN LOOP
 // ============================================================
+function generateDynamicProduct() {
+  const categories = ["📱 Elektronik", "🏡 Ev & Yaşam", "💄 Güzellik & Sağlık", "⛺ Outdoor & Spor", "🐾 Pet Tech", "🚗 Araç & Oto", "👶 Bebek & Çocuk", "🏋️ Fitness"];
+  const selectedCat = categories[Math.floor(Math.random() * categories.length)];
+  
+  const data = {
+    "📱 Elektronik": {
+      adj: ["Akıllı", "Kablosuz", "Hızlı Şarjlı", "Taşınabilir", "RGB LEDli", "Bluetoothlu", "Kameralı", "Mini"],
+      noun: ["Projektör", "Nemlendirici", "Şarj Standı", "Kulaklık", "Powerbank", "Ses Bombası", "Gece Lambası", "Tripod"],
+      q: ["Projector", "Humidifier", "Charging+Stand", "Earbuds", "Power+Bank", "Speaker", "Night+Light", "Tripod"]
+    },
+    "🏡 Ev & Yaşam": {
+      adj: ["Vakumlu", "Bambu", "Paslanmaz", "Çelik", "Katlanabilir", "Termal", "Organizer", "Pratik"],
+      noun: ["Saklama Kabı", "Kesme Tahtası", "Termos Kupa", "Mutfak Tartısı", "Baharatlık Seti", "Çöp Kovası", "Süzgeç", "Askılık"],
+      q: ["Storage+Container", "Cutting+Board", "Thermos+Mug", "Kitchen+Scale", "Spice+Rack", "Trash+Can", "Colander", "Hanger"]
+    },
+    "💄 Güzellik & Sağlık": {
+      adj: ["Sonik", "Silikon", "EMS Mikroakım", "LED Işıklı", "Isıtmalı", "Doğal Taş", "Masajlı", "Vibrasyonlu"],
+      noun: ["Yüz Fırçası", "Gua Sha", "Makyaj Aynası", "EMS Aleti", "Diş Fırçası", "Tırnak Törpüsü", "Saç Şekillendirici", "Buhar Makinesi"],
+      q: ["Face+Brush", "Gua+Sha", "Makeup+Mirror", "EMS+Device", "Toothbrush", "Nail+Drill", "Hair+Styler", "Face+Steamer"]
+    },
+    "⛺ Outdoor & Spor": {
+      adj: ["Su Geçirmez", "Polarize", "Katlanabilir", "Ultra Hafif", "Solar", "Karbon", "Yansıtıcı", "Termal"],
+      noun: ["Kamp Sandalyesi", "Sırt Çantası", "Fener", "Matara", "Trekking Bastonu", "Güneş Gözlüğü", "Kamp Kupası", "Yağmurluk"],
+      q: ["Camping+Chair", "Backpack", "Flashlight", "Water+Bottle", "Trekking+Pole", "Sunglasses", "Camp+Mug", "Raincoat"]
+    },
+    "🐾 Pet Tech": {
+      adj: ["Otomatik", "Akıllı", "Filtreli", "İnteraktif", "Dönen", "Lazerli", "GPS", "Taşınabilir"],
+      noun: ["Su Pınarı", "Mama Kabı", "Kedi Topu", "Lazer Oyuncağı", "Tasma Takip", "Taşıma Çantası", "Tırnak Makası", "Tüy Toplayıcı"],
+      q: ["Water+Fountain", "Feeder", "Cat+Ball", "Laser+Toy", "Collar+Tracker", "Carrier+Bag", "Nail+Clipper", "Hair+Remover"]
+    },
+    "🚗 Araç & Oto": {
+      adj: ["Kablosuz", "Manyetik", "Şarjlı", "360 Derece", "4K Ultra HD", "OBD2 Uyumlu", "Basınçlı", "Ergonomik"],
+      noun: ["Süpürge", "Dash Cam Kamera", "Telefon Tutucu", "HUD Ekran", "Koku Difüzörü", "Yıkama Tabancası", "TPMS Sensör", "Bel Desteği"],
+      q: ["Vacuum", "Dash+Cam", "Phone+Holder", "HUD+Display", "Diffuser", "Wash+Gun", "TPMS", "Lumbar+Support"]
+    },
+    "👶 Bebek & Çocuk": {
+      adj: ["Silikon", "BPA Free", "Montessori", "Ahşap", "Akıllı", "Görüntülü", "Taşınabilir", "Eğitici"],
+      noun: ["Bebek Monitörü", "Mama Seti", "Ahşap Oyuncak", "Sallanan Beşik", "GPS Bileklik", "Yürüteç", "Diş Kaşıyıcı", "Oyun Matı"],
+      q: ["Baby+Monitor", "Feeding+Set", "Wooden+Toy", "Baby+Swing", "GPS+Watch", "Baby+Walker", "Teether", "Play+Mat"]
+    },
+    "🏋️ Fitness": {
+      adj: ["Dirençli", "Akıllı Sayaçlı", "Anti-Slip TPE", "Ayarlanabilir", "Foam", "Elektrikli EMS", "Deri", "Çift Katlı"],
+      noun: ["Egzersiz Bandı", "Atlama İpi", "Yoga Matı", "Ağırlık Yeleği", "Masaj Rulosu", "Kas Stimülatörü", "Ağırlık Eldiveni", "Shaker"],
+      q: ["Resistance+Band", "Jump+Rope", "Yoga+Mat", "Weighted+Vest", "Foam+Roller", "EMS+Stimulator", "Gym+Gloves", "Shaker"]
+    }
+  };
+
+  const catData = data[selectedCat];
+  const adjIndex = Math.floor(Math.random() * catData.adj.length);
+  const nounIndex = Math.floor(Math.random() * catData.noun.length);
+  
+  const title = `${catData.adj[adjIndex]} ${catData.noun[nounIndex]}`;
+  const query = `${catData.adj[adjIndex]}+${catData.q[nounIndex]}`;
+  const id = `dyn_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+
+  const gtip = `${8400 + Math.floor(Math.random()*1200)}.${Math.floor(Math.random()*90)}.${Math.floor(Math.random()*90)}.00`;
+  const fob = Math.round((2.5 + Math.random() * 32.5) * 100) / 100;
+  const tr = Math.round(fob * 38.50 * (3 + Math.random() * 4));
+
+  return {
+    id,
+    title,
+    cat: selectedCat,
+    fob,
+    tr,
+    gtip,
+    img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80",
+    q: query
+  };
+}
+
 let scanIndex = 0;
 let scanPool = [...DB]; // shuffle once per session
 function shufflePool() {
@@ -594,25 +665,32 @@ async function scanLoop() {
     clearInterval(SCAN_INTERVAL);
     return;
   }
-  if (scanIndex >= scanPool.length) {
-    // All pool items checked — reshuffle but only unseen ones will pass
-    shufflePool();
-    scanIndex = 0;
-    // Safety: if everything is archived, stop
-    if (archiveSet.size >= DB.length) {
-      document.getElementById("bot-status").textContent = "✅ Tüm Ürünler Tarandı — Veri Tabanı Tam";
-      document.getElementById("limit-banner").style.display = "block";
-      clearInterval(SCAN_INTERVAL);
-      return;
+
+  let item = null;
+
+  // 1) Havuzda taranmamış ürün var mı diye bak
+  while (scanIndex < scanPool.length) {
+    const candidate = scanPool[scanIndex++];
+    if (!archiveSet.has(candidate.id)) {
+      item = candidate;
+      break;
     }
   }
 
-  const item = scanPool[scanIndex++];
+  // 2) Eğer sabit havuz bittiyse (tüm 108 ürün tarandıysa), dinamik ürün üret
+  if (!item) {
+    item = generateDynamicProduct();
+    while (archiveSet.has(item.id)) {
+      item = generateDynamicProduct();
+    }
+  }
+
   if (archiveSet.has(item.id)) {
     skippedCount++;
     document.getElementById("s-skip").textContent = skippedCount;
     return;
   }
+
 
   // Arama başladığını bildir
   const statusEl = document.getElementById("bot-status");
