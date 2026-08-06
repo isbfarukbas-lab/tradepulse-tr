@@ -586,7 +586,7 @@ initApp();
 
 const SCAN_INTERVAL = setInterval(scanLoop, 2800);
 
-function scanLoop() {
+async function scanLoop() {
   if (!isScanning) return;
   if (todayScanCount >= DAILY_LIMIT) {
     document.getElementById("limit-banner").style.display = "block";
@@ -614,9 +614,32 @@ function scanLoop() {
     return;
   }
 
-  // NEW UNIQUE ITEM — process it
-  const ai = calcAI(item);
-  const enriched = { ...item, ...ai, tikTok: tiktokScore(item), trComp: trCompetition(item), fbaW: fbaWeight(item), ts: new Date().toLocaleString('tr-TR') };
+  // Arama başladığını bildir
+  const statusEl = document.getElementById("bot-status");
+  if (statusEl) statusEl.textContent = `🔍 ${item.title.substring(0,25)}... için canlı Trendyol/Alibaba analizi yapılıyor...`;
+
+  let liveFob = item.fob;
+  let liveTr = item.tr;
+  let liveComp = trCompetition(item);
+
+  // SUNUCU ÜZERİNDEN GERÇEK TRENDYOL & ALIBABA VERİLERİNİ ÇEK
+  try {
+    const response = await fetch(`/api/live-check?trQuery=${encodeURIComponent(item.title)}&fobQuery=${encodeURIComponent(item.q)}&fallbackFob=${item.fob}&fallbackTr=${item.tr}`);
+    if (response.ok) {
+      const data = await response.json();
+      liveFob = data.fobPrice;
+      liveTr = data.trPrice;
+      liveComp = data.trComp;
+      console.log(`[CANLI VERİ] ${item.title} -> Trendyol: ₺${liveTr} (${data.trSource}), Alibaba: $${liveFob} (${data.alibabaSource}), Rekabet: ${liveComp}`);
+    }
+  } catch (err) {
+    console.warn('[CANLI API] Sunucu veri çekme hatası, simüle kur/fiyat devrede:', err.message);
+  }
+
+  // CANLI VERİLERLE HESAPLAMA YAP
+  const liveItem = { ...item, fob: liveFob, tr: liveTr };
+  const ai = calcAI(liveItem);
+  const enriched = { ...liveItem, ...ai, tikTok: tiktokScore(item), trComp: liveComp, fbaW: fbaWeight(liveItem), ts: new Date().toLocaleString('tr-TR') };
 
   archiveSet.add(item.id);
   archiveList.unshift(enriched);
@@ -629,6 +652,8 @@ function scanLoop() {
   renderTop10();
   updateTicker(enriched);
   highlightCat(item.cat);
+
+  if (statusEl) statusEl.textContent = "🤖 YZ MOTORİ ÇALIŞIYOR...";
 }
 
 function addLiveRow(p) {
