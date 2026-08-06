@@ -291,6 +291,84 @@
   </div>
 </div>
 
+<!-- CALCULATOR LEDGER BREAKDOWN MODAL -->
+<div class="modal-bg" id="m-calc">
+  <div class="modal" style="max-width:580px">
+    <button onclick="closeModal('calc')" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.08);border:none;color:#fff;padding:4px 10px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
+    <h3 style="color:#38bdf8;font-size:1.15rem;margin-bottom:4px">📊 Detaylı Gümrük, Kargo ve Kâr Analiz Dökümü</h3>
+    <div style="font-size:.75rem;color:#64748b;margin-bottom:12px" id="calc-prod-name">Ürün Adı</div>
+    
+    <div style="background:#080f1d;border:1px solid #1e293b;border-radius:10px;padding:10px;margin-bottom:14px;font-size:.78rem">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="color:#64748b">Güncel TCMB Dolar Kuru:</span>
+        <strong style="color:#34d399" id="calc-usd-rate">₺38.50</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="color:#64748b">Ürün GTİP Kodu:</span>
+        <strong style="color:#38bdf8" id="calc-gtip">--</strong>
+      </div>
+    </div>
+
+    <div style="background:#111827;border:1px solid #1e293b;border-radius:10px;overflow:hidden;margin-bottom:14px;font-size:.8rem">
+      <div style="background:#080f1d;padding:8px 12px;font-weight:700;color:#f1f5f9;font-size:.75rem">1. İTHALAT GİDERLERİ (ÇİN -> TR LİMAN TESLİM)</div>
+      <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#94a3b8">Birim FOB Alış (Çin):</span>
+          <strong id="calc-fob-try">0.00 ₺</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#94a3b8">Uluslararası Navlun / Kargo (Tahmini):</span>
+          <strong id="calc-freight">0.00 ₺</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#94a3b8">Gümrük Vergisi (%30):</span>
+          <strong id="calc-tax-duty" style="color:#fb923c">0.00 ₺</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#94a3b8">İthalat KDV (%20):</span>
+          <strong id="calc-tax-vat" style="color:#fb923c">0.00 ₺</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#94a3b8">Müşavirlik, Ardiye & Antrepo:</span>
+          <strong id="calc-clearance">40.00 ₺</strong>
+        </div>
+        <div style="border-top:1px dashed #1e293b;padding-top:6px;display:flex;justify-content:space-between;font-weight:700">
+          <span style="color:#f1f5f9">Toplam Landed Maliyet (Gümrük Kapı Teslim):</span>
+          <strong style="color:#fbbf24" id="calc-total-landed">0.00 ₺</strong>
+        </div>
+      </div>
+
+      <div style="background:#080f1d;padding:8px 12px;font-weight:700;color:#f1f5f9;font-size:.75rem;border-top:1px solid #1e293b">2. TÜRKİYE PAZARYERİ GİDERLERİ & SATIŞ</div>
+      <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#94a3b8">Hedef Türkiye Satış Fiyatı:</span>
+          <strong id="calc-selling">0.00 ₺</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#94a3b8">Trendyol Komisyonu (%18):</span>
+          <strong id="calc-comm" style="color:#f87171">0.00 ₺</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:#94a3b8">Yurtiçi Müşteri Kargo Bedeli:</span>
+          <strong id="calc-local-cargo" style="color:#f87171">45.00 ₺</strong>
+        </div>
+      </div>
+
+      <div style="background:rgba(52,211,153,.08);border-top:1px solid #1e293b;padding:12px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="color:#34d399;font-weight:800;font-size:.9rem" id="calc-net-profit">Birim Net Kâr: 0.00 ₺</div>
+          <div style="font-size:.7rem;color:#64748b;margin-top:1px" id="calc-margin">Net Kâr Marjı: %00</div>
+        </div>
+        <div style="text-align:right">
+          <span class="badge b-green" id="calc-roi">ROI: %00</span>
+        </div>
+      </div>
+    </div>
+    
+    <button class="btn btn-blue" style="width:100%;justify-content:center;padding:10px" onclick="closeModal('calc')">Kapat</button>
+  </div>
+</div>
+
 <script>
 // ============================================================
 // CONFIG & STATE
@@ -761,7 +839,8 @@ function addLiveRow(p) {
     <td><span class="badge b-red">🔥 ${p.tikTok}%</span></td>
     <td><span style="font-size:.75rem">${p.trComp}</span></td>
     <td><span class="badge b-orange">${p.fbaW}</span></td>
-    <td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-blue btn-sm" onclick="openLedger('${p.id}')">📊 DETAY</button>
       <button class="btn btn-orange btn-sm" onclick="openRfq('${p.title.replace(/'/g,"\\'")}',${p.fob},'${p.q}')">📄 RFQ</button>
     </td>
   </tr>`;
@@ -783,7 +862,10 @@ function addArchiveRow(p) {
     <td><span class="badge b-green">%${p.margin}</span></td>
     <td><strong style="color:${p.score>=85?'#34d399':p.score>=70?'#fbbf24':'#f87171'}">${p.score}/100 ${p.label}</strong></td>
     <td><span class="badge b-blue">${p.gtip}</span></td>
-    <td><a href="https://www.alibaba.com/trade/search?SearchText=${p.q}" target="_blank" class="btn btn-sm btn-orange" style="text-decoration:none">↗ Alibaba</a></td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-blue btn-sm" onclick="openLedger('${p.id}')">📊 DETAY</button>
+      <a href="https://www.alibaba.com/trade/search?SearchText=${p.q}" target="_blank" class="btn btn-sm btn-orange" style="text-decoration:none">↗ Alibaba</a>
+    </td>
   </tr>`;
   body.insertAdjacentHTML("afterbegin", row);
 }
@@ -820,7 +902,10 @@ function addArchiveRowDirect(p, body) {
     <td><span class="badge b-green">%${p.margin||0}</span></td>
     <td><strong style="color:${(p.score||0)>=85?'#34d399':(p.score||0)>=70?'#fbbf24':'#f87171'}">${p.score||0}/100</strong></td>
     <td><span class="badge b-blue">${p.gtip}</span></td>
-    <td><a href="https://www.alibaba.com/trade/search?SearchText=${p.q}" target="_blank" class="btn btn-sm btn-orange" style="text-decoration:none">↗ Alibaba</a></td>
+    <td style="white-space:nowrap">
+      <button class="btn btn-blue btn-sm" onclick="openLedger('${p.id}')">📊 DETAY</button>
+      <a href="https://www.alibaba.com/trade/search?SearchText=${p.q}" target="_blank" class="btn btn-sm btn-orange" style="text-decoration:none">↗ Alibaba</a>
+    </td>
   </tr>`;
   body.insertAdjacentHTML("beforeend", row);
 }
@@ -873,7 +958,10 @@ function renderTop10() {
         <span class="badge b-green">${p.trComp||'—'}</span>
         <span class="badge b-orange">${p.fbaW||'—'}</span>
       </div>
-      <button class="btn btn-orange btn-sm" style="width:100%;justify-content:center" onclick="openRfq('${p.title.replace(/'/g,"\\'")}',${p.fob},'${p.q}')">📄 RFQ Pazarlık Taslağı ↗</button>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button class="btn btn-blue btn-sm" style="flex:1;justify-content:center;font-size:.73rem" onclick="openLedger('${p.id}')">📊 HESAP DÖKÜMÜ</button>
+        <button class="btn btn-orange btn-sm" style="flex:1;justify-content:center;font-size:.73rem" onclick="openRfq('${p.title.replace(/'/g,"\\'")}',${p.fob},'${p.q}')">📄 RFQ ↗</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -964,6 +1052,46 @@ Faruk Baş | TradePulse TR
 isb.faruk.bas@gmail.com`;
   document.getElementById("rfq-link").href = `https://www.alibaba.com/trade/search?SearchText=${q}`;
   openModal("rfq");
+}
+
+function openLedger(id) {
+  let p = archiveList.find(x => x.id === id);
+  if (!p) p = masterProductPool.find(x => x.id === id);
+  if (!p) p = scanPool.find(x => x.id === id);
+  if (!p) return;
+
+  const landed = Math.round((p.fob * USD_RATE * 1.5) + 40);
+  const commission = Math.round(p.tr * 0.18);
+  const cargo = 45;
+  const netProfit = p.tr - landed - commission - cargo;
+  const margin = Math.round((netProfit / p.tr) * 100);
+  const roi = Math.round((netProfit / landed) * 100);
+
+  const fobTry = p.fob * USD_RATE;
+  // Itemize the 1.5 Landed Cost multiplier
+  const estFreight = fobTry * 0.08; 
+  const baseForDuty = fobTry + estFreight;
+  const customsDuty = baseForDuty * 0.30;
+  const baseForVat = baseForDuty + customsDuty;
+  const vat = baseForVat * 0.20;
+
+  document.getElementById("calc-prod-name").innerHTML = `<span class="badge b-purple">${p.cat}</span> <strong>${p.title}</strong>`;
+  document.getElementById("calc-usd-rate").textContent = `₺${USD_RATE.toFixed(4)} (Resmi TCMB Güncel Kuru)`;
+  document.getElementById("calc-gtip").textContent = `${p.gtip || 'Bilinmiyor'} (CE, RoHS Gümrük Beyannameli)`;
+  
+  document.getElementById("calc-fob-try").textContent = `$${p.fob.toFixed(2)} (₺${fobTry.toFixed(2)})`;
+  document.getElementById("calc-freight").textContent = `₺${estFreight.toFixed(2)} (Hacimsel Ağırlık / Desi: ${p.fbaW || '0.8 desi'})`;
+  document.getElementById("calc-tax-duty").textContent = `₺${customsDuty.toFixed(2)}`;
+  document.getElementById("calc-tax-vat").textContent = `₺${vat.toFixed(2)}`;
+  document.getElementById("calc-total-landed").textContent = `₺${landed.toLocaleString('tr-TR')} (Gümrük Vergileri ve Masraflar Dahil)`;
+
+  document.getElementById("calc-selling").textContent = `₺${p.tr.toLocaleString('tr-TR')} (Trendyol Canlı Satış Değeri)`;
+  document.getElementById("calc-comm").textContent = `₺${commission.toLocaleString('tr-TR')} (Pazaryeri Komisyonu %18)`;
+  document.getElementById("calc-net-profit").textContent = `Birim Net Kâr: ₺${netProfit.toLocaleString('tr-TR')}`;
+  document.getElementById("calc-margin").textContent = `Net Kâr Marjı: %${margin}`;
+  document.getElementById("calc-roi").textContent = `Yatırım Getirisi (ROI): %${roi}`;
+
+  openModal('calc');
 }
 
 function copyRfq() {
