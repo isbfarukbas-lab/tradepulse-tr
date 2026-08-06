@@ -229,6 +229,33 @@
     <!-- ARCHIVE VIEW -->
     <div id="v-archive" style="display:none">
       <div class="section-header sh-purple">💾 KALICI LOCALSTORAGE VERİ TABANI — Sayfa yenilense, tarayıcı kapansa bile tüm geçmiş korunur. Hiçbir ürün iki kez taranmaz.</div>
+      
+      <!-- FILTER & SORT CONTROLS -->
+      <div style="background:#111827;border:1px solid #1e293b;border-radius:14px;padding:12px;margin-bottom:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <input type="text" id="arch-search" class="inp" placeholder="🔍 Ürün adı ara..." style="flex:2;margin-top:0" oninput="filterArchive()">
+        
+        <select id="arch-cat-filter" class="inp" style="flex:1;margin-top:0" onchange="filterArchive()">
+          <option value="all">📁 Tüm Kategoriler</option>
+          <option value="📱 Elektronik">📱 Elektronik</option>
+          <option value="🏡 Ev & Yaşam">🏡 Ev & Yaşam</option>
+          <option value="💄 Güzellik & Sağlık">💄 Güzellik & Sağlık</option>
+          <option value="⛺ Outdoor & Spor">⛺ Outdoor & Spor</option>
+          <option value="🐾 Pet Tech">🐾 Pet Tech</option>
+          <option value="🚗 Araç & Oto">🚗 Araç & Oto</option>
+          <option value="👶 Bebek & Çocuk">👶 Bebek & Çocuk</option>
+          <option value="🏋️ Fitness">🏋️ Fitness</option>
+        </select>
+
+        <select id="arch-sort" class="inp" style="flex:1;margin-top:0" onchange="filterArchive()">
+          <option value="score-desc">🏆 YZ Skoru: Azalan</option>
+          <option value="profit-desc">💸 Net Kâr: Azalan</option>
+          <option value="margin-desc">📈 Kâr Marjı: Azalan</option>
+          <option value="fob-asc">💵 FOB Alış: Artan</option>
+          <option value="tr-desc">🏷️ TR Satış: Azalan</option>
+          <option value="time-desc">🕒 Tarih: En Yeni</option>
+        </select>
+      </div>
+
       <div class="tbl-wrap">
         <table>
           <thead>
@@ -300,13 +327,23 @@
     <div style="font-size:.75rem;color:#64748b;margin-bottom:12px" id="calc-prod-name">Ürün Adı</div>
     
     <div style="background:#080f1d;border:1px solid #1e293b;border-radius:10px;padding:10px;margin-bottom:14px;font-size:.78rem">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
         <span style="color:#64748b">Güncel TCMB Dolar Kuru:</span>
         <strong style="color:#34d399" id="calc-usd-rate">₺38.50</strong>
       </div>
-      <div style="display:flex;justify-content:space-between">
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
         <span style="color:#64748b">Ürün GTİP Kodu:</span>
         <strong style="color:#38bdf8" id="calc-gtip">--</strong>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px dashed #1e293b;padding-top:8px;margin-top:6px">
+        <div>
+          <label style="color:#94a3b8;font-size:.7rem;font-weight:700">Simülasyon: FOB Alış ($):</label>
+          <input type="number" id="calc-fob-input" class="inp" style="margin-top:2px;padding:5px 8px;font-size:.78rem" step="0.01" oninput="recalculateLedger()">
+        </div>
+        <div>
+          <label style="color:#94a3b8;font-size:.7rem;font-weight:700">Simülasyon: TR Satış (₺):</label>
+          <input type="number" id="calc-tr-input" class="inp" style="margin-top:2px;padding:5px 8px;font-size:.78rem" step="1" oninput="recalculateLedger()">
+        </div>
       </div>
     </div>
 
@@ -380,6 +417,29 @@
       </div>
     </div>
 
+    <h4 style="color:#25D366;font-size:.9rem;margin-bottom:8px">📱 Otonom WhatsApp Bildirim Ayarları (Watchlist)</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">WhatsApp Alarmları:</label>
+        <select id="set-wa-enabled" class="inp">
+          <option value="false">Kapalı ❌</option>
+          <option value="true">Açık ✅</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">Minimum Kâr Marjı Eşiği (%):</label>
+        <input type="number" id="set-wa-margin" class="inp" min="0" max="100">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">WhatsApp Telefon No:</label>
+        <input type="text" id="set-wa-phone" class="inp" placeholder="+905XXXXXXXXX">
+      </div>
+      <div>
+        <label style="font-size:.75rem;color:#94a3b8">CallMeBot API Key:</label>
+        <input type="text" id="set-wa-key" class="inp" placeholder="1234567">
+      </div>
+    </div>
+
     <div style="display:flex;gap:10px">
       <button class="btn btn-green" style="flex:1;justify-content:center" onclick="saveFinancialSettings()">💾 Ayarları Kaydet & Yenile</button>
       <button class="btn btn-blue" style="flex:0.5;justify-content:center" onclick="closeModal('settings')">Kapat</button>
@@ -415,7 +475,11 @@ let FINANCIAL_SETTINGS = {
   commTrendyol: 18,   // Trendyol %18
   commHepsiburada: 17,// Hepsiburada %17
   commAmazon: 15,     // Amazon %15
-  commN11: 15         // n11 %15
+  commN11: 15,        // n11 %15
+  waEnabled: false,   // WhatsApp alarmları kapalı
+  waMinMargin: 60,    // Minimum kâr marjı eşiği %60
+  waPhone: "",        // Telefon numarası
+  waApiKey: ""        // CallMeBot API key
 };
 
 // ============================================================
@@ -866,11 +930,21 @@ async function scanLoop() {
   saveState();
 
   addLiveRow(enriched);
-  addArchiveRow(enriched);
+  filterArchive(); // Refresh sorted and filtered archive view immediately
   updateStats();
   renderTop10();
   updateTicker(enriched);
   highlightCat(item.cat);
+
+  // Otonom WhatsApp Alarm Kontrolü
+  if (FINANCIAL_SETTINGS.waEnabled && FINANCIAL_SETTINGS.waPhone && FINANCIAL_SETTINGS.waApiKey) {
+    if (enriched.margin >= FINANCIAL_SETTINGS.waMinMargin) {
+      const waMsg = `🔥 TradePulse TR Alarm!\n\nBulutta Yüksek Kârlı Yeni Ürün Bulundu:\n📦 ${enriched.title}\n\n💵 FOB Alış: $${enriched.fob.toFixed(2)} (₺${(enriched.fob * USD_RATE).toFixed(2)})\n🏷️ TR Satış: ₺${enriched.tr.toLocaleString()}\n📈 Net Kâr: ₺${enriched.netProfit.toLocaleString()} (%${enriched.margin} Marj)\n🏆 YZ Skoru: ${enriched.score}/100\n\nDetaylar: https://tradepulse-node.onrender.com`;
+      fetch(`https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(FINANCIAL_SETTINGS.waPhone)}&text=${encodeURIComponent(waMsg)}&apikey=${encodeURIComponent(FINANCIAL_SETTINGS.waApiKey)}`, { mode: "no-cors" })
+        .then(() => console.log(`📱 WhatsApp Fırsat Alarmı Gönderildi: ${enriched.title}`))
+        .catch(err => console.error('WhatsApp Alarm Hatası:', err));
+    }
+  }
 
   if (statusEl) statusEl.textContent = "🤖 YZ MOTORİ ÇALIŞIYOR...";
 }
@@ -934,23 +1008,15 @@ function addArchiveRow(p) {
 }
 
 function renderArchive() {
-  const body = document.getElementById("archive-body");
-  const empty = document.getElementById("archive-empty");
-  if (!body) return;
-  body.innerHTML = "";
-  if (archiveList.length === 0) {
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
+  // Fill missing details on load
   archiveList.forEach(p => {
     if (!p.netProfit) { const ai = calcAI(p); Object.assign(p, ai); }
     if (!p.tikTok) p.tikTok = tiktokScore(p);
     if (!p.trComp) p.trComp = trCompetition(p);
     if (!p.fbaW) p.fbaW = fbaWeight(p);
     if (!p.ts) p.ts = "—";
-    addArchiveRowDirect(p, body);
   });
+  filterArchive();
 }
 
 function addArchiveRowDirect(p, body) {
@@ -1117,14 +1183,47 @@ isb.faruk.bas@gmail.com`;
   openModal("rfq");
 }
 
+let activeLedgerProductId = null;
+
 function openLedger(id) {
   let p = archiveList.find(x => x.id === id);
   if (!p) p = masterProductPool.find(x => x.id === id);
   if (!p) p = scanPool.find(x => x.id === id);
   if (!p) return;
 
-  const ai = calcAI(p);
-  const fobTry = p.fob * USD_RATE;
+  activeLedgerProductId = id;
+
+  document.getElementById("calc-prod-name").innerHTML = `<span class="badge b-purple">${p.cat}</span> <strong>${p.title}</strong>`;
+  document.getElementById("calc-usd-rate").textContent = `₺${USD_RATE.toFixed(4)} (Resmi TCMB Güncel Kuru)`;
+  document.getElementById("calc-gtip").textContent = `${p.gtip || 'Bilinmiyor'} (CE, RoHS Uyumlu)`;
+
+  // Set simulation inputs initial values
+  document.getElementById("calc-fob-input").value = p.fob;
+  document.getElementById("calc-tr-input").value = p.tr;
+
+  // Run dynamic calculation
+  recalculateLedger();
+
+  openModal('calc');
+}
+
+function recalculateLedger() {
+  const id = activeLedgerProductId;
+  if (!id) return;
+
+  let p = archiveList.find(x => x.id === id);
+  if (!p) p = masterProductPool.find(x => x.id === id);
+  if (!p) p = scanPool.find(x => x.id === id);
+  if (!p) return;
+
+  const simFob = parseFloat(document.getElementById("calc-fob-input").value) || 0;
+  const simTr = parseFloat(document.getElementById("calc-tr-input").value) || 0;
+
+  // Run calcAI with simulated pricing
+  const tempItem = { ...p, fob: simFob, tr: simTr };
+  const ai = calcAI(tempItem);
+
+  const fobTry = simFob * USD_RATE;
   const estFreight = fobTry * 0.08; 
   const cifValue = fobTry + estFreight;
   const gv = cifValue * (FINANCIAL_SETTINGS.gvRate / 100);
@@ -1135,14 +1234,10 @@ function openLedger(id) {
   const kdvBase = otvBase + otv;
   const kdv = kdvBase * (FINANCIAL_SETTINGS.kdvRate / 100);
 
-  document.getElementById("calc-prod-name").innerHTML = `<span class="badge b-purple">${p.cat}</span> <strong>${p.title}</strong>`;
-  document.getElementById("calc-usd-rate").textContent = `₺${USD_RATE.toFixed(4)} (Resmi TCMB Güncel Kuru)`;
-  document.getElementById("calc-gtip").textContent = `${p.gtip || 'Bilinmiyor'} (CE, RoHS Uyumlu)`;
-
   const importHtml = `
     <div style="display:flex;justify-content:space-between">
       <span style="color:#94a3b8">Birim FOB Alış (Çin):</span>
-      <strong>$${p.fob.toFixed(2)} (₺${fobTry.toFixed(2)})</strong>
+      <strong>$${simFob.toFixed(2)} (₺${fobTry.toFixed(2)})</strong>
     </div>
     <div style="display:flex;justify-content:space-between">
       <span style="color:#94a3b8">Uluslararası Navlun / Kargo:</span>
@@ -1179,11 +1274,16 @@ function openLedger(id) {
   `;
   document.getElementById("calc-import-list").innerHTML = importHtml;
 
-  const markets = p.marketplaces || {
-    trendyol: Math.round(p.tr),
-    hepsiburada: Math.round(p.tr * 0.98),
-    amazon: Math.round(p.tr * 0.95),
-    n11: Math.round(p.tr * 0.97)
+  // Marketplace comparison
+  const baseRatioHb = p.marketplaces ? (p.marketplaces.hepsiburada / p.tr) : 0.98;
+  const baseRatioAmz = p.marketplaces ? (p.marketplaces.amazon / p.tr) : 0.95;
+  const baseRatioN11 = p.marketplaces ? (p.marketplaces.n11 / p.tr) : 0.97;
+
+  const markets = {
+    trendyol: Math.round(simTr),
+    hepsiburada: Math.round(simTr * baseRatioHb),
+    amazon: Math.round(simTr * baseRatioAmz),
+    n11: Math.round(simTr * baseRatioN11)
   };
 
   const pTrendyol = Math.round(markets.trendyol - ai.landed - (markets.trendyol * (FINANCIAL_SETTINGS.commTrendyol / 100)) - FINANCIAL_SETTINGS.localCargo);
@@ -1198,25 +1298,23 @@ function openLedger(id) {
 
   const marketHtml = `
     <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid #1e293b">
-      <span style="font-weight:700;color:#fbbf24">🛍️ Trendyol:</span>
+      <span style="font-weight:700;color:#fbbf24">🛍️ Trendyol (${FINANCIAL_SETTINGS.commTrendyol}% Kom):</span>
       <span>Fiyat: <strong>₺${markets.trendyol.toLocaleString()}</strong> | Net Kâr: <strong style="color:#34d399">₺${pTrendyol} (%${mTrendyol})</strong></span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid #1e293b">
-      <span style="font-weight:700;color:#fbbf24">🛍️ Hepsiburada:</span>
+      <span style="font-weight:700;color:#fbbf24">🛍️ Hepsiburada (${FINANCIAL_SETTINGS.commHepsiburada}% Kom):</span>
       <span>Fiyat: <strong>₺${markets.hepsiburada.toLocaleString()}</strong> | Net Kâr: <strong style="color:#34d399">₺${pHepsiburada} (%${mHepsiburada})</strong></span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:4px;border-bottom:1px solid #1e293b">
-      <span style="font-weight:700;color:#fbbf24">🛍️ Amazon TR:</span>
+      <span style="font-weight:700;color:#fbbf24">🛍️ Amazon TR (${FINANCIAL_SETTINGS.commAmazon}% Kom):</span>
       <span>Fiyat: <strong>₺${markets.amazon.toLocaleString()}</strong> | Net Kâr: <strong style="color:#34d399">₺${pAmazon} (%${mAmazon})</strong></span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <span style="font-weight:700;color:#fbbf24">🛍️ n11:</span>
+      <span style="font-weight:700;color:#fbbf24">🛍️ n11 (${FINANCIAL_SETTINGS.commN11}% Kom):</span>
       <span>Fiyat: <strong>₺${markets.n11.toLocaleString()}</strong> | Net Kâr: <strong style="color:#34d399">₺${pN11} (%${mN11})</strong></span>
     </div>
   `;
   document.getElementById("calc-marketplace-list").innerHTML = marketHtml;
-
-  openModal('calc');
 }
 
 function openSettingsModal() {
@@ -1230,6 +1328,13 @@ function openSettingsModal() {
   document.getElementById("set-comm-hb").value = FINANCIAL_SETTINGS.commHepsiburada;
   document.getElementById("set-comm-amz").value = FINANCIAL_SETTINGS.commAmazon;
   document.getElementById("set-comm-n11").value = FINANCIAL_SETTINGS.commN11;
+
+  // WhatsApp settings
+  document.getElementById("set-wa-enabled").value = FINANCIAL_SETTINGS.waEnabled ? "true" : "false";
+  document.getElementById("set-wa-margin").value = FINANCIAL_SETTINGS.waMinMargin;
+  document.getElementById("set-wa-phone").value = FINANCIAL_SETTINGS.waPhone || "";
+  document.getElementById("set-wa-key").value = FINANCIAL_SETTINGS.waApiKey || "";
+
   openModal('settings');
 }
 
@@ -1245,6 +1350,12 @@ function saveFinancialSettings() {
   FINANCIAL_SETTINGS.commAmazon = parseFloat(document.getElementById("set-comm-amz").value) || 0;
   FINANCIAL_SETTINGS.commN11 = parseFloat(document.getElementById("set-comm-n11").value) || 0;
 
+  // Save WhatsApp values
+  FINANCIAL_SETTINGS.waEnabled = document.getElementById("set-wa-enabled").value === "true";
+  FINANCIAL_SETTINGS.waMinMargin = parseFloat(document.getElementById("set-wa-margin").value) || 60;
+  FINANCIAL_SETTINGS.waPhone = document.getElementById("set-wa-phone").value.trim();
+  FINANCIAL_SETTINGS.waApiKey = document.getElementById("set-wa-key").value.trim();
+
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(FINANCIAL_SETTINGS));
   
   // Recalculate and refresh views
@@ -1258,7 +1369,59 @@ function saveFinancialSettings() {
   renderTop10();
   
   closeModal('settings');
-  alert("✅ Finansal Hesaplama Ayarları Kaydedildi ve Tüm Tablolar Güncellendi!");
+  alert("💾 Finansal Hesaplama & WhatsApp Alarm Ayarları Kaydedildi!");
+}
+
+// SEARCH, FILTER & SORT ENGINE
+function filterArchive() {
+  const query = document.getElementById("arch-search").value.toLowerCase().trim();
+  const cat = document.getElementById("arch-cat-filter").value;
+  const sortOption = document.getElementById("arch-sort").value;
+
+  const body = document.getElementById("archive-body");
+  const empty = document.getElementById("archive-empty");
+  if (!body) return;
+  body.innerHTML = "";
+
+  // 1) Filter
+  let filtered = archiveList.filter(p => {
+    const matchQuery = p.title.toLowerCase().includes(query) || (p.gtip && p.gtip.includes(query));
+    const matchCat = cat === "all" || p.cat === cat;
+    return matchQuery && matchCat;
+  });
+
+  // 2) Sort
+  filtered.sort((a, b) => {
+    switch (sortOption) {
+      case "score-desc":
+        return (b.score || 0) - (a.score || 0);
+      case "profit-desc":
+        return (b.netProfit || 0) - (a.netProfit || 0);
+      case "margin-desc":
+        return (b.margin || 0) - (a.margin || 0);
+      case "fob-asc":
+        return (a.fob || 0) - (b.fob || 0);
+      case "tr-desc":
+        return (b.tr || 0) - (a.tr || 0);
+      case "time-desc":
+      default:
+        // Parse dates or fallback to array index
+        const tA = a.ts ? new Date(a.ts.replace(/(\d+)\.(\d+)\.(\d+)/, '$3-$2-$1')) : 0;
+        const tB = b.ts ? new Date(b.ts.replace(/(\d+)\.(\d+)\.(\d+)/, '$3-$2-$1')) : 0;
+        return tB - tA;
+    }
+  });
+
+  // 3) Render
+  if (filtered.length === 0) {
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  filtered.forEach(p => {
+    addArchiveRowDirect(p, body);
+  });
 }
 
 function copyRfq() {
