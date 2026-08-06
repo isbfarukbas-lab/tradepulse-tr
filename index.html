@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradePulse TR — Yapay Zeka Ticaret Analiz Motoru</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Plus Jakarta Sans',sans-serif;color:#f8fafc;min-height:100vh;background:#07111f;padding:12px}
+    body::before{content:'';position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 50% 0%,rgba(99,102,241,.22) 0%,transparent 55%),radial-gradient(ellipse at 90% 80%,rgba(6,182,212,.15) 0%,transparent 50%),linear-gradient(180deg,#07111f 0%,#0f1f3a 100%)}
+    .frame{max-width:1800px;margin:0 auto;background:rgba(10,18,35,.97);border:1.5px solid rgba(99,102,241,.35);border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.8);overflow:hidden}
+
+    /* NAVBAR */
+    header{padding:14px 24px;display:flex;justify-content:space-between;align-items:center;background:#080f1d;border-bottom:2px solid #3b82f6;flex-wrap:wrap;gap:12px}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+    .logo-name{font-family:'Outfit',sans-serif;font-weight:900;font-size:1.3rem}
+    .logo-name span{color:#38bdf8}
+    .logo-sub{font-size:.72rem;color:#64748b;margin-top:1px}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap}
+    .tab{background:transparent;color:#64748b;border:1px solid #1e293b;padding:8px 14px;font-weight:700;font-size:.8rem;cursor:pointer;border-radius:8px;transition:all .2s}
+    .tab.on{background:#3b82f6;color:#fff;border-color:#3b82f6}
+    .nav-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+    /* BUTTONS */
+    .btn{border:none;padding:8px 16px;border-radius:999px;font-weight:800;font-size:.8rem;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+    .btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+    .btn-blue{background:linear-gradient(135deg,#4f46e5,#3b82f6);color:#fff;box-shadow:0 4px 14px rgba(79,70,229,.4)}
+    .btn-green{background:linear-gradient(135deg,#10b981,#059669);color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.4)}
+    .btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;box-shadow:0 4px 14px rgba(37,211,102,.35)}
+    .btn-orange{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 4px 14px rgba(245,158,11,.4)}
+    .btn-sm{padding:5px 10px;border-radius:7px;font-size:.73rem}
+
+    /* STATUS BAR */
+    .status-bar{margin:16px;background:#111827;border:1px solid #1e293b;border-radius:14px;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    .pulse{width:10px;height:10px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399;animation:pulse 1.5s infinite;display:inline-block;margin-right:6px}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.35)}}
+    .stat-pill{padding:6px 12px;border-radius:8px;font-size:.82rem;font-weight:700;display:inline-flex;align-items:center;gap:6px}
+    .sp-green{background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:#34d399}
+    .sp-yellow{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:#fbbf24}
+    .sp-blue{background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.4);color:#38bdf8}
+    .sp-red{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#f87171}
+    .sp-purple{background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);color:#c084fc}
+
+    /* CATEGORY CHIPS */
+    .cat-chips{margin:0 16px 8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .chip{padding:5px 12px;border-radius:999px;font-size:.75rem;font-weight:700;border:1px solid;cursor:default;transition:all .3s}
+    .chip.active-chip{transform:scale(1.08);box-shadow:0 0 12px currentColor}
+
+    /* TICKER */
+    .ticker-box{margin:0 16px 12px;background:#0d1a2e;border:1px solid rgba(56,189,248,.25);border-radius:10px;padding:10px 16px;font-size:.82rem;color:#94a3b8}
+
+    /* CONTENT */
+    .content{padding:0 16px 20px}
+
+    /* TABLES */
+    .tbl-wrap{width:100%;overflow-x:auto;background:#111827;border:1px solid #1e293b;border-radius:14px;margin-top:10px}
+    table{width:100%;border-collapse:collapse;font-size:.8rem;text-align:left}
+    th{background:#080f1d;color:#64748b;padding:12px 13px;font-weight:700;border-bottom:2px solid #1e293b;white-space:nowrap}
+    td{padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:middle}
+    tr.new-row{animation:rowIn .6s ease forwards}
+    @keyframes rowIn{from{background:rgba(52,211,153,.3)}to{background:transparent}}
+    .thumb{width:46px;height:46px;object-fit:cover;border-radius:8px;border:1px solid #1e293b}
+
+    /* BADGES */
+    .badge{padding:3px 8px;border-radius:6px;font-size:.68rem;font-weight:700;display:inline-block}
+    .b-gold{background:rgba(245,158,11,.2);color:#fbbf24;border:1px solid rgba(245,158,11,.4)}
+    .b-green{background:rgba(52,211,153,.2);color:#34d399;border:1px solid rgba(52,211,153,.4)}
+    .b-blue{background:rgba(56,189,248,.2);color:#38bdf8;border:1px solid rgba(56,189,248,.4)}
+    .b-purple{background:rgba(168,85,247,.2);color:#c084fc;border:1px solid rgba(168,85,247,.4)}
+    .b-red{background:rgba(239,68,68,.2);color:#f87171;border:1px solid rgba(239,68,68,.4)}
+    .b-orange{background:rgba(249,115,22,.2);color:#fb923c;border:1px solid rgba(249,115,22,.4)}
+
+    /* SCORE BAR */
+    .score-bar{height:6px;border-radius:3px;background:#1e293b;margin-top:4px;overflow:hidden}
+    .score-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#10b981,#34d399)}
+
+    /* MODAL */
+    .modal-bg{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:20px}
+    .modal-bg.on{display:flex}
+    .modal{background:#0a1221;border:1px solid rgba(56,189,248,.4);border-radius:20px;max-width:680px;width:100%;padding:26px;position:relative;max-height:90vh;overflow-y:auto}
+    .inp{width:100%;padding:10px 14px;background:#060d1a;border:1px solid #1e293b;color:#fff;border-radius:10px;outline:none;margin-top:4px;font-size:.88rem}
+
+    /* TOP10 CARD GRID */
+    .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:12px}
+    .card{background:#111827;border:1px solid #1e293b;border-radius:14px;padding:16px;transition:all .25s;position:relative;overflow:hidden}
+    .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#6366f1,#06b6d4)}
+    .card:hover{border-color:#3b82f6;transform:translateY(-3px);box-shadow:0 12px 35px rgba(59,130,246,.2)}
+    .card.rank-1::before{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+    .card.rank-2::before{background:linear-gradient(90deg,#94a3b8,#cbd5e1)}
+    .card.rank-3::before{background:linear-gradient(90deg,#b45309,#d97706)}
+    .rank-badge{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem}
+    .card-img{width:100%;height:130px;object-fit:cover;border-radius:10px;margin-bottom:10px}
+    .card-title{font-weight:700;font-size:.88rem;color:#f1f5f9;margin-bottom:6px;line-height:1.35}
+
+    /* EMPTY STATE */
+    .empty-state{text-align:center;padding:48px 20px;color:#475569}
+    .empty-state .big-icon{font-size:3rem;margin-bottom:12px}
+
+    /* PROGRESS RING */
+    .progress-ring{display:flex;align-items:center;gap:8px}
+
+    /* DÖVIZ */
+    .dolar-badge{background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.1));border:1px solid #10b981;color:#34d399;padding:6px 14px;border-radius:8px;font-size:.82rem;font-weight:800}
+
+    /* ARCHIVE HEADER */
+    .section-header{padding:12px 18px;border-radius:10px;font-size:.85rem;font-weight:700;margin-bottom:10px}
+    .sh-gold{background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(16,185,129,.15));border:1px solid rgba(245,158,11,.4);color:#fbbf24}
+    .sh-blue{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.3);color:#38bdf8}
+    .sh-purple{background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);color:#c084fc}
+
+    /* DAILY LIMIT BANNER */
+    .limit-banner{background:linear-gradient(135deg,rgba(16,185,129,.2),rgba(5,150,105,.1));border:1px solid #10b981;border-radius:14px;padding:20px;text-align:center;margin-top:12px;display:none}
+
+    /* ANIMATIONS */
+    @keyframes fadeSlide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    .fade-in{animation:fadeSlide .4s ease forwards}
+  </style>
+</head>
+<body>
+<div class="frame">
+
+  <!-- NAVBAR -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🤖</div>
+      <div>
+        <div class="logo-name">TradePulse<span>TR</span></div>
+        <div class="logo-sub">Hafızalı YZ Ticaret & Finansal Risk Analiz Motoru — 7/24</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab on" id="t-top10" onclick="goTab('top10')">🏆 TOP 10 ŞAMPİYON</button>
+      <button class="tab" id="t-live" onclick="goTab('live')">📊 GÜNLÜK TARAMA (<span id="scan-count-tab">0</span>/100)</button>
+      <button class="tab" id="t-archive" onclick="goTab('archive')">💾 TÜM GEÇMİŞ (<span id="archive-count-tab">0</span>)</button>
+    </div>
+
+    <div class="nav-actions">
+      <div class="dolar-badge" id="dolar-badge">💵 $1 = ₺38.50</div>
+      <button class="btn btn-wa" onclick="openModal('wa')">📱 WhatsApp</button>
+      <button class="btn btn-green" onclick="dlExcel()">📥 Excel İndir</button>
+      <button class="btn btn-blue" onclick="sendMail()">📧 E-Posta Gönder</button>
+    </div>
+  </header>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="pulse"></span>
+      <strong style="color:#34d399;font-size:.9rem" id="bot-status">🤖 YZ MOTORİ ÇALIŞIYOR...</strong>
+      <div style="font-size:.8rem;color:#64748b;margin-left:4px" id="ticker-main">Sistem başlatılıyor...</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <span class="stat-pill sp-green">💾 Tarama: <strong id="s-scanned">0</strong>/100</span>
+      <span class="stat-pill sp-yellow">🛡️ Engellenen: <strong id="s-skip">0</strong></span>
+      <span class="stat-pill sp-blue">📦 Toplam Geçmiş: <strong id="s-archive">0</strong></span>
+      <span class="stat-pill sp-purple">🕒 <span id="clock">--:--:--</span></span>
+      <button class="btn btn-sm" style="background:#1e293b;color:#94a3b8;border:none;font-weight:700;cursor:pointer" id="btn-pause" onclick="toggleScan()">⏸️ Duraklat</button>
+    </div>
+  </div>
+
+  <!-- CATEGORY CHIPS -->
+  <div class="cat-chips" id="cat-chips">
+    <span style="font-size:.75rem;color:#475569;font-weight:700">KATEGORİ ROTASYONU:</span>
+    <span class="chip" style="color:#38bdf8;border-color:#38bdf8" data-cat="📱 Elektronik">📱 Elektronik</span>
+    <span class="chip" style="color:#34d399;border-color:#34d399" data-cat="🏡 Ev & Yaşam">🏡 Ev & Yaşam</span>
+    <span class="chip" style="color:#c084fc;border-color:#c084fc" data-cat="💄 Güzellik & Sağlık">💄 Güzellik</span>
+    <span class="chip" style="color:#fbbf24;border-color:#fbbf24" data-cat="⛺ Outdoor & Spor">⛺ Outdoor</span>
+    <span class="chip" style="color:#f87171;border-color:#f87171" data-cat="🐾 Pet Tech">🐾 Pet Tech</span>
+    <span class="chip" style="color:#fb923c;border-color:#fb923c" data-cat="🚗 Araç & Oto">🚗 Araç</span>
+    <span class="chip" style="color:#a78bfa;border-color:#a78bfa" data-cat="👶 Bebek & Çocuk">👶 Bebek</span>
+    <span class="chip" style="color:#2dd4bf;border-color:#2dd4bf" data-cat="🏋️ Fitness">🏋️ Fitness</span>
+  </div>
+
+  <!-- LIVE TICKER -->
+  <div class="ticker-box" id="ticker-box">⏳ Tarama motoru yükleniyor, lütfen bekleyin...</div>
+
+  <!-- VIEWS -->
+  <div class="content">
+
+    <!-- TOP 10 VIEW -->
+    <div id="v-top10">
+      <div class="section-header sh-gold">🏆 YAPAY ZEKÂ TARAFINDAN "ASLA ZARAR ETTİRMEYECEK" TOP 10 İTHALAT ŞAMPİYONU — %30-85 Net Kâr Marjı, Sıfır Türkiye Rekabeti, %98+ Fabrika Güvenilirliği</div>
+      <div class="card-grid" id="top10-grid">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="big-icon">⏳</div>
+          <div style="font-weight:700;color:#475569">Yapay Zekâ En Az 10 Ürün Tarıyor...</div>
+          <div style="font-size:.8rem;color:#334155;margin-top:6px">Lütfen birkaç saniye bekleyin, Top 10 otomatik doldurulacak.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE SCAN VIEW -->
+    <div id="v-live" style="display:none">
+      <div class="section-header sh-blue">📊 GÜNLÜK CANLI HAM TARAMA HAVUZU — Her ürün benzersiz, tekrar yok, tüm detaylar analiz ediliyor</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Görsel</th>
+              <th>Ürün Adı & Kategori</th>
+              <th>GTİP Kodu</th>
+              <th>FOB Alış</th>
+              <th>TR Satış</th>
+              <th>Gümrük+Maliyet</th>
+              <th>Net Kâr & Marj</th>
+              <th>YZ AI Skoru</th>
+              <th>TikTok 🔥</th>
+              <th>TR Rekabeti</th>
+              <th>FBA Desi</th>
+              <th>Aksiyon</th>
+            </tr>
+          </thead>
+          <tbody id="live-body"></tbody>
+        </table>
+      </div>
+      <div class="limit-banner" id="limit-banner">
+        <div style="font-size:1.5rem;margin-bottom:8px">✅</div>
+        <div style="font-weight:800;color:#34d399;font-size:1.05rem">Bugünkü 100 Tarama Tamamlandı!</div>
+        <div style="font-size:.85rem;color:#94a3b8;margin-top:6px">Sistem yarın sabah 09:00'da otomatik olarak yeniden başlayacak. Top 10 Şampiyon Kataloğu görüntüleyin.</div>
+      </div>
+    </div>
+
+    <!-- ARCHIVE VIEW -->
+    <div id="v-archive" style="display:none">
+      <div class="section-header sh-purple">💾 KALICI LOCALSTORAGE VERİ TABANI — Sayfa yenilense, tarayıcı kapansa bile tüm geçmiş korunur. Hiçbir ürün iki kez taranmaz.</div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tarih/Saat</th>
+              <th>Görsel</th>
+              <th>Ürün Adı</th>
+              <th>Kategori</th>
+              <th>FOB $</th>
+              <th>TR Satış ₺</th>
+              <th>Net Kâr ₺</th>
+              <th>Marj %</th>
+              <th>YZ Skoru</th>
+              <th>GTİP</th>
+              <th>Alibaba</th>
+            </tr>
+          </thead>
+          <tbody id="archive-body"></tbody>
+        </table>
+      </div>
+      <div id="archive-empty" class="empty-state" style="display:none">
+        <div class="big-icon">💾</div>
+        <div style="font-weight:700;color:#475569">Henüz Arşiv Yok</div>
+        <div style="font-size:.8rem;color:#334155;margin-top:6px">Tarama başladığında geçmiş ürünler buraya kaydedilecek.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- RFQ MODAL -->
+<div class="modal-bg" id="m-rfq">
+  <div class="modal">
+    <button onclick="closeModal('rfq')" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.08);border:none;color:#fff;padding:4px 10px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
+    <h3 style="color:#fbbf24;font-size:1.15rem;margin-bottom:6px">📄 Alibaba İngilizce RFQ Pazarlık Taslağı</h3>
+    <p style="font-size:.8rem;color:#64748b;margin-bottom:14px">Çinli tedarikçiye kopyalayıp gönderebileceğiniz profesyonel mesaj:</p>
+    <textarea id="rfq-area" style="width:100%;height:230px;background:#060d1a;border:1px solid #1e293b;border-radius:10px;color:#34d399;font-family:monospace;font-size:.8rem;padding:12px;outline:none;margin-bottom:12px"></textarea>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-green" style="flex:1;justify-content:center" onclick="copyRfq()">📋 Kopyala</button>
+      <a id="rfq-link" href="#" target="_blank" class="btn btn-orange" style="flex:1;justify-content:center;text-decoration:none">🏭 Alibaba'ya Git ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- WHATSAPP MODAL -->
+<div class="modal-bg" id="m-wa">
+  <div class="modal">
+    <button onclick="closeModal('wa')" style="position:absolute;top:14px;right:14px;background:rgba(255,255,255,.08);border:none;color:#fff;padding:4px 10px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
+    <h3 style="color:#25D366;font-size:1.15rem;margin-bottom:6px">📱 Gerçek WhatsApp Bildirim Kurulumu</h3>
+    <div style="background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.25);padding:12px;border-radius:10px;font-size:.8rem;margin-bottom:14px;color:#94a3b8;line-height:1.6">
+      <strong style="color:#25D366">CallMeBot ile Ücretsiz API Key Alma (1 dk):</strong><br>
+      1. WhatsApp'tan <strong>+34 644 44 44 44</strong> numarasına mesaj gönderin.<br>
+      2. Mesaj içeriği: <code style="background:#1e293b;padding:2px 6px;border-radius:4px">I allow callmebot to send me messages</code><br>
+      3. Gelen cevapta <strong>API Key</strong> numaranız yazar — aşağıya girin!
+    </div>
+    <label style="font-size:.8rem;color:#64748b">Telefon No (ülke kodu ile):</label>
+    <input type="text" id="wa-phone" class="inp" placeholder="+905XXXXXXXXX" style="margin-bottom:10px">
+    <label style="font-size:.8rem;color:#64748b">CallMeBot API Key:</label>
+    <input type="text" id="wa-key" class="inp" placeholder="1234567" style="margin-bottom:14px">
+    <button class="btn btn-wa" style="width:100%;justify-content:center;padding:12px" onclick="sendWA()">🚀 Test Mesajı Gönder</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG & STATE
+// ============================================================
+const STORAGE_KEY = "tradepulse_v3";
+const DAILY_LIMIT = 100;
+let USD_RATE = 38.50;  // Sunucudan gerçek TCMB kuru alınacak
+
+let isScanning = true;
+let todayScanCount = 0;
+let skippedCount = 0;
+let archiveList = [];
+let archiveSet = new Set();
+let todayKey = new Date().toDateString();
+
+// ============================================================
+// LOAD PERSISTENT STATE — Sunucu API + localStorage fallback
+// ============================================================
+async function loadState() {
+  // 1) Sunucu tarafı state'i dene
+  try {
+    const r = await fetch('/api/state');
+    if (r.ok) {
+      const d = await r.json();
+      if (d && Array.isArray(d.list) && d.list.length > 0) {
+        archiveList = d.list;
+        archiveSet  = new Set(d.sigs || []);
+        todayScanCount = d.day === todayKey ? (d.todayCount || 0) : 0;
+        console.log(`💾 Sunucu hafızası yüklendi: ${archiveList.length} ürün`);
+        return;
+      }
+    }
+  } catch(e) { console.warn('Sunucu state yüklenemedi, localStorage kullanılıyor:', e.message); }
+
+  // 2) localStorage fallback
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    archiveList    = d.list || [];
+    archiveSet     = new Set(d.sigs || []);
+    todayScanCount = d.day === todayKey ? (d.todayCount || 0) : 0;
+    console.log(`💾 localStorage yüklendi: ${archiveList.length} ürün`);
+  } catch(e) { console.error(e); }
+}
+
+function saveState() {
+  const payload = {
+    list: archiveList,
+    sigs: Array.from(archiveSet),
+    todayCount: todayScanCount,
+    day: todayKey
+  };
+  // 1) Sunucuya kaydet (arka planda)
+  fetch('/api/state', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
+  // 2) localStorage yedek
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(payload)); } catch(e) {}
+}
+
+// ============================================================
+// 200 UNIQUE PRODUCT DATABASE
+// ============================================================
+const DB = [
+  // 📱 ELEKTRONİK
+  {id:"e001",title:"UV-C Dezenfektanlı Akıllı Termos 600ml",cat:"📱 Elektronik",fob:11.5,tr:1650,gtip:"9617.00.00.00",img:"https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&q=80",q:"UV+Thermal+Bottle"},
+  {id:"e002",title:"3'ü 1 Manyetik Kablosuz Şarj Standı 15W",cat:"📱 Elektronik",fob:7.2,tr:950,gtip:"8504.40.95.00",img:"https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=400&q=80",q:"Magnetic+Wireless+Charger+Stand"},
+  {id:"e003",title:"Bluetooth 5.3 Boyun Bandı Kulaklık ANC",cat:"📱 Elektronik",fob:9.8,tr:1280,gtip:"8518.30.95.00",img:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80",q:"Neckband+Bluetooth+ANC+Headphone"},
+  {id:"e004",title:"Lazer Ölçüm Cihazı 50M Dijital",cat:"📱 Elektronik",fob:8.5,tr:1100,gtip:"9017.80.10.00",img:"https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?w=400&q=80",q:"Laser+Distance+Meter"},
+  {id:"e005",title:"Akıllı Kapı Zili WiFi Kameralı 1080p",cat:"📱 Elektronik",fob:14.2,tr:1950,gtip:"8531.10.30.00",img:"https://images.unsplash.com/photo-1558002038-1055907df827?w=400&q=80",q:"Smart+Video+Doorbell+WiFi"},
+  {id:"e006",title:"Mini LED Projektör 200 Lümen Portable",cat:"📱 Elektronik",fob:18.5,tr:2450,gtip:"9008.60.00.00",img:"https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&q=80",q:"Mini+LED+Projector+Portable"},
+  {id:"e007",title:"Güneş Enerjili Taşınabilir Güç Bankası 20000mAh",cat:"📱 Elektronik",fob:12.8,tr:1680,gtip:"8507.60.00.00",img:"https://images.unsplash.com/photo-1609592806596-b0f8a6d0a1a2?w=400&q=80",q:"Solar+Power+Bank+20000mAh"},
+  {id:"e008",title:"USB-C Hub 9-in-1 HDMI 4K SD Kartlı",cat:"📱 Elektronik",fob:6.9,tr:890,gtip:"8473.30.80.00",img:"https://images.unsplash.com/photo-1625599525769-e04ca3e1d42b?w=400&q=80",q:"USB+C+Hub+9+in+1+HDMI"},
+  {id:"e009",title:"Akıllı Priz 4'lü WiFi+USB Uzaktan Kontrol",cat:"📱 Elektronik",fob:5.4,tr:720,gtip:"8536.69.90.00",img:"https://images.unsplash.com/photo-1558089687-f282ffcbc0d3?w=400&q=80",q:"Smart+Power+Strip+WiFi"},
+  {id:"e010",title:"Drone Kameralı 4K Katlanabilir GPS",cat:"📱 Elektronik",fob:42,tr:5800,gtip:"8806.21.00.00",img:"https://images.unsplash.com/photo-1473968512647-3e447244af8f?w=400&q=80",q:"4K+Foldable+GPS+Drone"},
+  {id:"e011",title:"AI Çeviri Kulakiçi 40 Dil Anlık",cat:"📱 Elektronik",fob:16.5,tr:2150,gtip:"8518.30.95.00",img:"https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&q=80",q:"AI+Translation+Earbuds"},
+  {id:"e012",title:"Oyuncu Mekanik Klavye RGB 60%",cat:"📱 Elektronik",fob:11.2,tr:1450,gtip:"8471.60.20.00",img:"https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&q=80",q:"Mechanical+Gaming+Keyboard+RGB"},
+  {id:"e013",title:"Webcam 4K Geniş Açı Otofokus",cat:"📱 Elektronik",fob:13.5,tr:1780,gtip:"8525.80.19.00",img:"https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400&q=80",q:"4K+Webcam+Autofocus+Wide+Angle"},
+  {id:"e014",title:"Akıllı Tartı Vücut Analizi 14 Ölçüm WiFi",cat:"📱 Elektronik",fob:7.8,tr:1020,gtip:"8423.10.10.00",img:"https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&q=80",q:"Smart+Body+Scale+WiFi+BMI"},
+  {id:"e015",title:"Kablosuz Şarjlı Mouse Sessiz 800DPI",cat:"📱 Elektronik",fob:4.8,tr:620,gtip:"8471.60.90.00",img:"https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&q=80",q:"Wireless+Silent+Mouse+Ergonomic"},
+
+  // 🏡 EV & YAŞAM
+  {id:"h001",title:"Ultrasonik Meyve Sebze Dezenfektanı",cat:"🏡 Ev & Yaşam",fob:8.9,tr:1200,gtip:"8421.21.00.00",img:"https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=400&q=80",q:"Ultrasonic+Fruit+Vegetable+Purifier"},
+  {id:"h002",title:"Bluetooth Et Termometresi 6 Prob",cat:"🏡 Ev & Yaşam",fob:11.8,tr:1580,gtip:"9025.19.20.00",img:"https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80",q:"Smart+Meat+Thermometer+6+Probe"},
+  {id:"h003",title:"Vakumlu Kapaklı Saklama Kabı Seti 8'li",cat:"🏡 Ev & Yaşam",fob:5.2,tr:680,gtip:"3924.10.00.00",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",q:"Vacuum+Food+Storage+Container+Set"},
+  {id:"h004",title:"Akıllı Hava Temizleyici HEPA H13 25m2",cat:"🏡 Ev & Yaşam",fob:22.5,tr:2980,gtip:"8421.39.20.00",img:"https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&q=80",q:"Smart+Air+Purifier+HEPA+H13"},
+  {id:"h005",title:"Robotik Yer Süpürgesi Mop Özellikli 2800Pa",cat:"🏡 Ev & Yaşam",fob:38.5,tr:5200,gtip:"8508.11.00.00",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",q:"Robot+Vacuum+Mop+2800Pa"},
+  {id:"h006",title:"Bambu Kesme Tahtası Oluklu 3'lü Set",cat:"🏡 Ev & Yaşam",fob:4.1,tr:540,gtip:"4419.11.00.00",img:"https://images.unsplash.com/photo-1585518419759-7fe2e0fbf8a6?w=400&q=80",q:"Bamboo+Cutting+Board+Set"},
+  {id:"h007",title:"Cam Elektrikli Su Isıtıcı Sıcaklık Kontrollü",cat:"🏡 Ev & Yaşam",fob:9.2,tr:1250,gtip:"8516.10.11.00",img:"https://images.unsplash.com/photo-1544568100-847a948585b9?w=400&q=80",q:"Glass+Electric+Kettle+Temperature+Control"},
+  {id:"h008",title:"LED Şerit 5M RGB+W 16 Milyon Renk WiFi",cat:"🏡 Ev & Yaşam",fob:3.8,tr:490,gtip:"9405.40.39.00",img:"https://images.unsplash.com/photo-1545048702-79362596cdc9?w=400&q=80",q:"LED+Strip+Light+RGB+WiFi+5M"},
+  {id:"h009",title:"Ahşap Masa Üstü Düzenleyici 6 Bölmeli",cat:"🏡 Ev & Yaşam",fob:6.8,tr:890,gtip:"4421.90.98.00",img:"https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&q=80",q:"Wooden+Desk+Organizer+6+Slot"},
+  {id:"h010",title:"Çift Kişilik Pamuklu Nevresim 200x220 Organik",cat:"🏡 Ev & Yaşam",fob:7.5,tr:980,gtip:"6302.21.00.00",img:"https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400&q=80",q:"Organic+Cotton+Duvet+Cover+Set"},
+  {id:"h011",title:"Masaüstü Nemlendirici Hava 500ml Aroma",cat:"🏡 Ev & Yaşam",fob:4.5,tr:590,gtip:"8509.80.00.00",img:"https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400&q=80",q:"Desk+Humidifier+Aroma+Diffuser"},
+  {id:"h012",title:"Çok Fonksiyonlu Mutfak Tartısı 0.1g Hassas",cat:"🏡 Ev & Yaşam",fob:3.6,tr:470,gtip:"8423.10.10.00",img:"https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&q=80",q:"Digital+Kitchen+Scale+0.1g"},
+  {id:"h013",title:"Paslanmaz Çelik Yalıtımlı Öğle Yemeği Kutusu 3 Katlı",cat:"🏡 Ev & Yaşam",fob:5.9,tr:780,gtip:"7323.93.90.00",img:"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",q:"Stainless+Steel+Lunch+Box+3+Tier"},
+  {id:"h014",title:"Tembellik Koltuk Yatağı Balkon Pillow Sofa",cat:"🏡 Ev & Yaşam",fob:12.4,tr:1650,gtip:"9401.40.00.00",img:"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80",q:"Floor+Pillow+Sofa+Lazy+Bag"},
+  {id:"h015",title:"Akıllı Ampul E27 RGB 16M Renk WiFi Alexa",cat:"🏡 Ev & Yaşam",fob:2.8,tr:370,gtip:"8539.50.00.00",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",q:"Smart+Bulb+E27+RGB+WiFi+Alexa"},
+
+  // 💄 GÜZELLİK & SAĞLIK
+  {id:"b001",title:"Elektrikli Kas Masaj Tabancası 6 Başlıklı",cat:"💄 Güzellik & Sağlık",fob:9.8,tr:1350,gtip:"9019.10.10.00",img:"https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=400&q=80",q:"Massage+Gun+6+Head+Deep+Tissue"},
+  {id:"b002",title:"LED Işıklı Makyaj Aynası Powerbankli 10x",cat:"💄 Güzellik & Sağlık",fob:7.8,tr:1050,gtip:"7009.92.00.00",img:"https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&q=80",q:"LED+Makeup+Mirror+Power+Bank"},
+  {id:"b003",title:"Yüz EMS Mikroakım Kırışık Giderici Cihazı",cat:"💄 Güzellik & Sağlık",fob:8.5,tr:1150,gtip:"9019.20.00.00",img:"https://images.unsplash.com/photo-1570554886111-e80fcca6a029?w=400&q=80",q:"EMS+Face+Lift+Microcurrent+Device"},
+  {id:"b004",title:"IPL Lazer Epilasyon Cihazı 300.000 Atış",cat:"💄 Güzellik & Sağlık",fob:18.5,tr:2450,gtip:"8543.70.90.00",img:"https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&q=80",q:"IPL+Laser+Hair+Removal+300000"},
+  {id:"b005",title:"Elektrikli Diş Fırçası Sonik 5 Mod USB Şarj",cat:"💄 Güzellik & Sağlık",fob:6.2,tr:820,gtip:"8509.40.00.00",img:"https://images.unsplash.com/photo-1559757175-5700dde675bc?w=400&q=80",q:"Sonic+Electric+Toothbrush+5+Mode"},
+  {id:"b006",title:"Saç Düzleştirici İyonize Keratin 230°C",cat:"💄 Güzellik & Sağlık",fob:7.4,tr:980,gtip:"8516.32.00.00",img:"https://images.unsplash.com/photo-1562594980-47ad4563abe5?w=400&q=80",q:"Hair+Straightener+Ionic+Keratin"},
+  {id:"b007",title:"Göz Altı Karartma Masaj Aleti Vibrasyon EMS",cat:"💄 Güzellik & Sağlık",fob:5.5,tr:730,gtip:"9019.20.00.00",img:"https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=400&q=80",q:"Eye+Massager+EMS+Vibration"},
+  {id:"b008",title:"Nano Mist Yüz Spreyi Taşınabilir Mini",cat:"💄 Güzellik & Sağlık",fob:3.9,tr:510,gtip:"8424.10.00.00",img:"https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=400&q=80",q:"Nano+Mist+Face+Sprayer+Portable"},
+  {id:"b009",title:"Doğal Taş Gua Sha Yüz Masaj Seti 4'lü",cat:"💄 Güzellik & Sağlık",fob:4.2,tr:550,gtip:"9019.10.90.00",img:"https://images.unsplash.com/photo-1614159102492-8fe02ed4e0e1?w=400&q=80",q:"Gua+Sha+Stone+Face+Massage+Set"},
+  {id:"b010",title:"Yüz Temizleyici Silikon Sonik Fırça Su Geçirmez",cat:"💄 Güzellik & Sağlık",fob:5.8,tr:760,gtip:"8509.80.00.00",img:"https://images.unsplash.com/photo-1556228720-195a672e8a03?w=400&q=80",q:"Sonic+Silicone+Face+Cleansing+Brush"},
+
+  // ⛺ OUTDOOR & SPOR
+  {id:"o001",title:"USB Isıtmalı Akıllı Termal Yelek Unisex",cat:"⛺ Outdoor & Spor",fob:12.4,tr:1680,gtip:"6307.90.98.00",img:"https://images.unsplash.com/photo-1544441893-675973e31985?w=400&q=80",q:"USB+Heated+Vest+Electric"},
+  {id:"o002",title:"Katlanabilir Kamp Sandalyesi Ultra Hafif 1.2kg",cat:"⛺ Outdoor & Spor",fob:8.2,tr:1080,gtip:"9401.80.80.00",img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80",q:"Folding+Camping+Chair+Ultralight"},
+  {id:"o003",title:"Su Geçirmez Bisiklet Çantası 10L Reflektörlü",cat:"⛺ Outdoor & Spor",fob:6.5,tr:860,gtip:"4202.92.91.00",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",q:"Waterproof+Bicycle+Bag+10L"},
+  {id:"o004",title:"GPS Akıllı Saat Spor Koşu Nabız Oksijen",cat:"⛺ Outdoor & Spor",fob:19.8,tr:2650,gtip:"9102.12.00.00",img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80",q:"GPS+Sports+Smartwatch+Heart+Rate"},
+  {id:"o005",title:"Güneş Gözlüğü Polarize UV400 Unisex",cat:"⛺ Outdoor & Spor",fob:3.2,tr:420,gtip:"9004.10.10.00",img:"https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&q=80",q:"Polarized+Sunglasses+UV400"},
+  {id:"o006",title:"Yansıtıcı Koşu Yeleği LED Görünür Gece",cat:"⛺ Outdoor & Spor",fob:4.8,tr:630,gtip:"6211.42.00.00",img:"https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80",q:"Reflective+Running+Vest+LED"},
+  {id:"o007",title:"Titanyum Kamp Bardağı 400ml Hafif",cat:"⛺ Outdoor & Spor",fob:5.5,tr:720,gtip:"7615.10.10.00",img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80",q:"Titanium+Camp+Mug+400ml"},
+  {id:"o008",title:"Trekking Baston 2'li Set Karbon Hafif",cat:"⛺ Outdoor & Spor",fob:9.5,tr:1260,gtip:"6602.00.00.00",img:"https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&q=80",q:"Carbon+Trekking+Poles+Pair"},
+  {id:"o009",title:"Su Filtreli Matara Lifestraw Teknoloji",cat:"⛺ Outdoor & Spor",fob:8.9,tr:1180,gtip:"3926.90.97.00",img:"https://images.unsplash.com/photo-1610824352934-c10d87b700cc?w=400&q=80",q:"Water+Filter+Bottle+Lifestraw"},
+  {id:"o010",title:"Katlanabilir Elektrikli Scooter 350W 30km",cat:"⛺ Outdoor & Spor",fob:85,tr:11500,gtip:"8714.10.90.00",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",q:"Electric+Scooter+350W+Foldable"},
+
+  // 🐾 PET TECH
+  {id:"p001",title:"İnteraktif Dönen Işıklı Kedi Topu Otomatik",cat:"🐾 Pet Tech",fob:2.8,tr:420,gtip:"9503.00.95.00",img:"https://images.unsplash.com/photo-1545249390-6bdfa286032f?w=400&q=80",q:"Interactive+Cat+Ball+Automatic"},
+  {id:"p002",title:"Otomatik Su Filtreli Kedi Pınarı 2.5L",cat:"🐾 Pet Tech",fob:8.4,tr:1150,gtip:"8413.70.21.00",img:"https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=400&q=80",q:"Automatic+Cat+Water+Fountain+2.5L"},
+  {id:"p003",title:"GPS Köpek Takip Yaka Koşma Takip",cat:"🐾 Pet Tech",fob:14.5,tr:1950,gtip:"8526.10.00.00",img:"https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80",q:"GPS+Dog+Collar+Tracker"},
+  {id:"p004",title:"Otomatik Evcil Hayvan Mama Makinası WiFi",cat:"🐾 Pet Tech",fob:18.5,tr:2480,gtip:"8479.89.97.00",img:"https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?w=400&q=80",q:"Automatic+Pet+Feeder+WiFi+Camera"},
+  {id:"p005",title:"Kediler için Lazerli Otomatik Oyun Aleti",cat:"🐾 Pet Tech",fob:4.2,tr:560,gtip:"9503.00.95.00",img:"https://images.unsplash.com/photo-1548681528-6a5c45b66b42?w=400&q=80",q:"Automatic+Laser+Cat+Toy"},
+  {id:"p006",title:"Köpek Kıyafeti Yağmurluk Yansıtıcı M/L",cat:"🐾 Pet Tech",fob:5.2,tr:690,gtip:"4201.00.00.00",img:"https://images.unsplash.com/photo-1601758124510-52d02ddb7cbd?w=400&q=80",q:"Dog+Raincoat+Reflective"},
+  {id:"p007",title:"Evcil Hayvan Taşıma Çantası Kabin Uyumlu",cat:"🐾 Pet Tech",fob:11.5,tr:1520,gtip:"4202.92.91.00",img:"https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=400&q=80",q:"Pet+Travel+Carrier+Bag+Cabin"},
+  {id:"p008",title:"Ultrasonik Evcil Hayvan Köpek Kovucu",cat:"🐾 Pet Tech",fob:5.8,tr:760,gtip:"8543.70.90.00",img:"https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&q=80",q:"Ultrasonic+Dog+Repeller+Deterrent"},
+
+  // 🚗 ARAÇ & OTO
+  {id:"c001",title:"Araç İçi Şarjlı Katlanabilir Süpürge 120W",cat:"🚗 Araç & Oto",fob:10.5,tr:1450,gtip:"8508.11.00.00",img:"https://images.unsplash.com/photo-1558317374-067fb5f30001?w=400&q=80",q:"Car+Vacuum+Cordless+120W"},
+  {id:"c002",title:"Araç Kamerası 4K Dash Cam GPS Gece Görüş",cat:"🚗 Araç & Oto",fob:22.5,tr:2980,gtip:"8525.80.19.00",img:"https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=400&q=80",q:"4K+Dash+Cam+GPS+Night+Vision"},
+  {id:"c003",title:"HUD Head-Up Display OBD2 Araç Hız",cat:"🚗 Araç & Oto",fob:11.5,tr:1520,gtip:"8708.99.97.00",img:"https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400&q=80",q:"HUD+Head+Up+Display+OBD2"},
+  {id:"c004",title:"Araç Manyetik Telefon Tutucu 360° Ayarlanabilir",cat:"🚗 Araç & Oto",fob:2.5,tr:320,gtip:"8708.29.90.00",img:"https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=400&q=80",q:"Car+Magnetic+Phone+Holder+360"},
+  {id:"c005",title:"Araç Hava Tazeleme Koku Difüzör USB",cat:"🚗 Araç & Oto",fob:3.2,tr:420,gtip:"8509.80.00.00",img:"https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80",q:"Car+Air+Freshener+USB+Diffuser"},
+  {id:"c006",title:"Araç Koltuğu Seyahat Yastığı Bel Desteği",cat:"🚗 Araç & Oto",fob:6.8,tr:890,gtip:"9404.90.90.00",img:"https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=400&q=80",q:"Car+Seat+Lumbar+Support+Cushion"},
+  {id:"c007",title:"Lastik Basınç Monitörü Kablosuz TPMS 4 Sensör",cat:"🚗 Araç & Oto",fob:9.8,tr:1300,gtip:"9026.20.20.00",img:"https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400&q=80",q:"TPMS+Wireless+Tire+Pressure+Monitor"},
+  {id:"c008",title:"Araç Yıkama Köpük Tabancası Basınçlı",cat:"🚗 Araç & Oto",fob:8.2,tr:1080,gtip:"8424.20.00.00",img:"https://images.unsplash.com/photo-1520340356584-f9917d1eea6f?w=400&q=80",q:"Foam+Cannon+Car+Wash+Pressure"},
+
+  // 👶 BEBEK & ÇOCUK
+  {id:"k001",title:"Bebek Monitörü WiFi 1080p Gece Görüş Ses",cat:"👶 Bebek & Çocuk",fob:21.5,tr:2850,gtip:"8525.80.19.00",img:"https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=400&q=80",q:"Baby+Monitor+WiFi+1080p+Night+Vision"},
+  {id:"k002",title:"Silikon Bebek Mama Seti 6'lı BPA Free",cat:"👶 Bebek & Çocuk",fob:4.5,tr:590,gtip:"3924.10.00.00",img:"https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&q=80",q:"Silicone+Baby+Feeding+Set+BPA+Free"},
+  {id:"k003",title:"Montessori Ahşap Oyuncak Seti 0-3 Yaş 10 Parça",cat:"👶 Bebek & Çocuk",fob:7.2,tr:950,gtip:"9503.00.10.00",img:"https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&q=80",q:"Montessori+Wooden+Toy+Set"},
+  {id:"k004",title:"Akıllı Bebek Sallanan Beşik Otomatik Müzikli",cat:"👶 Bebek & Çocuk",fob:32.5,tr:4300,gtip:"9401.89.00.00",img:"https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80",q:"Smart+Baby+Swing+Automatic+Music"},
+  {id:"k005",title:"Bebek Baş Koruyucu Kask Yürümeye Başlayan",cat:"👶 Bebek & Çocuk",fob:3.8,tr:500,gtip:"6506.10.80.00",img:"https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=400&q=80",q:"Baby+Head+Protector+Helmet+Toddler"},
+  {id:"k006",title:"Taşınabilir Bebek Hamak Çanta Yatak Seyahat",cat:"👶 Bebek & Çocuk",fob:11.5,tr:1520,gtip:"9404.29.90.00",img:"https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&q=80",q:"Portable+Baby+Hammock+Travel+Bed"},
+  {id:"k007",title:"Çocuk GPS Akıllı Bileklik Telefon SIM",cat:"👶 Bebek & Çocuk",fob:16.5,tr:2180,gtip:"8517.62.00.00",img:"https://images.unsplash.com/photo-1564466809058-bf4114d55352?w=400&q=80",q:"Kids+GPS+Smart+Watch+Phone+SIM"},
+
+  // 🏋️ FITNESS
+  {id:"f001",title:"Direnç Lastiği 5'li Set Fabric Band Pilates",cat:"🏋️ Fitness",fob:3.8,tr:490,gtip:"3926.20.00.00",img:"https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&q=80",q:"Resistance+Band+Set+5+Fabric+Pilates"},
+  {id:"f002",title:"Akıllı Atlama İpi Dijital Sayaç Kablosuz",cat:"🏋️ Fitness",fob:5.2,tr:680,gtip:"9506.91.80.00",img:"https://images.unsplash.com/photo-1434596922112-19c563067271?w=400&q=80",q:"Smart+Jump+Rope+Digital+Counter"},
+  {id:"f003",title:"Yoga Matı Anti-Kayma 6mm TPE Çanta Dahil",cat:"🏋️ Fitness",fob:6.8,tr:890,gtip:"9506.91.80.00",img:"https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&q=80",q:"Yoga+Mat+Anti+Slip+6mm+TPE"},
+  {id:"f004",title:"Ağırlık Yeleği 10kg Ayarlanabilir Spor",cat:"🏋️ Fitness",fob:14.5,tr:1950,gtip:"9506.91.80.00",img:"https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&q=80",q:"Weighted+Vest+10kg+Adjustable"},
+  {id:"f005",title:"Foam Roller Masaj Silindiri Kaslar 33cm",cat:"🏋️ Fitness",fob:4.8,tr:630,gtip:"9506.91.80.00",img:"https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80",q:"Foam+Roller+Massage+33cm"},
+  {id:"f006",title:"EMS Elektrikli Kas Stimülatörü 6 Ped Karın",cat:"🏋️ Fitness",fob:8.5,tr:1120,gtip:"9019.10.10.00",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",q:"EMS+Muscle+Stimulator+Abdominal"},
+  {id:"f007",title:"Spor Kemer Bel Ağırlık Desteği Powerlifting",cat:"🏋️ Fitness",fob:7.2,tr:950,gtip:"3926.20.00.00",img:"https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80",q:"Weightlifting+Belt+Powerlifting"},
+  {id:"f008",title:"Pull-Up Çubuk Kapı Tipli Çıkma Bar 100kg",cat:"🏋️ Fitness",fob:9.5,tr:1260,gtip:"9506.91.80.00",img:"https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=400&q=80",q:"Pull+Up+Bar+Doorway+100kg"},
+  {id:"f009",title:"Mini Egzersiz Bisikleti Masaaltı Pedalı",cat:"🏋️ Fitness",fob:12.5,tr:1650,gtip:"9506.91.80.00",img:"https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80",q:"Mini+Under+Desk+Bike+Pedal+Exerciser"},
+  {id:"f010",title:"Protein Shaker 700ml BPA Free Çift Hazneli",cat:"🏋️ Fitness",fob:3.2,tr:420,gtip:"3924.10.00.00",img:"https://images.unsplash.com/photo-1579722820308-d74e571900a9?w=400&q=80",q:"Protein+Shaker+700ml+BPA+Free"},
+
+  // Extra products for 100 unique daily scans
+  {id:"x001",title:"Reçine Epoksi Kristal Masa Örtüsü 60x120",cat:"🏡 Ev & Yaşam",fob:9.5,tr:1280,gtip:"3920.30.00.00",img:"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80",q:"Epoxy+Resin+Table+Cover+Crystal"},
+  {id:"x002",title:"Çay Demleme Akıllı Pot Sıcaklık Kontrol",cat:"🏡 Ev & Yaşam",fob:14.5,tr:1920,gtip:"8516.10.19.00",img:"https://images.unsplash.com/photo-1544568100-847a948585b9?w=400&q=80",q:"Smart+Tea+Pot+Temperature+Control"},
+  {id:"x003",title:"Taşınabilir Sıkıştırmalı Çanta 4'lü Set",cat:"🏡 Ev & Yaşam",fob:5.8,tr:760,gtip:"4202.92.91.00",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",q:"Compression+Packing+Cube+Set"},
+  {id:"x004",title:"Manyetik Kitap Okuma Lambası LED Şarjlı",cat:"🏡 Ev & Yaşam",fob:4.2,tr:550,gtip:"9405.40.35.00",img:"https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=400&q=80",q:"Magnetic+Book+Reading+Light+LED"},
+  {id:"x005",title:"Seramik Bıçak Seti 5'li Premium",cat:"🏡 Ev & Yaşam",fob:8.5,tr:1120,gtip:"8211.91.10.00",img:"https://images.unsplash.com/photo-1593618998160-e34014e67546?w=400&q=80",q:"Ceramic+Knife+Set+5+Piece+Premium"},
+  {id:"x006",title:"Mantar Dekor Gece Lambası Gökkuşağı LED",cat:"🏡 Ev & Yaşam",fob:3.5,tr:460,gtip:"9405.40.35.00",img:"https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80",q:"Mushroom+Night+Light+LED+Rainbow"},
+  {id:"x007",title:"Ahşap Dijital Fotoğraf Çerçevesi WiFi 10''",cat:"📱 Elektronik",fob:19.5,tr:2580,gtip:"8521.90.00.00",img:"https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&q=80",q:"Digital+Photo+Frame+WiFi+10+inch"},
+  {id:"x008",title:"Akıllı Beyaz Gürültü Makinası 20 Ses",cat:"📱 Elektronik",fob:11.5,tr:1520,gtip:"9019.20.00.00",img:"https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&q=80",q:"White+Noise+Machine+20+Sounds"},
+  {id:"x009",title:"Kablosuz Araç Şarjı MagSafe Uyumlu 15W",cat:"🚗 Araç & Oto",fob:6.8,tr:890,gtip:"8504.40.95.00",img:"https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=400&q=80",q:"Wireless+Car+Charger+MagSafe+15W"},
+  {id:"x010",title:"Gece Görüşlü Balıkçı Kamerası Su Altı HD",cat:"⛺ Outdoor & Spor",fob:18.5,tr:2450,gtip:"8525.89.00.00",img:"https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&q=80",q:"Underwater+Fishing+Camera+Night+Vision"},
+  {id:"x011",title:"Akıllı Çiçek Saksı Otomatik Sulama Sensörlü",cat:"🏡 Ev & Yaşam",fob:7.2,tr:950,gtip:"3926.40.00.00",img:"https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400&q=80",q:"Smart+Flower+Pot+Auto+Watering"},
+  {id:"x012",title:"Meditasyon Yastığı Zafu Buckwheat Organik",cat:"🏋️ Fitness",fob:8.5,tr:1120,gtip:"9404.90.90.00",img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&q=80",q:"Meditation+Cushion+Zafu+Buckwheat"},
+  {id:"x013",title:"Titanyum Cüzdan İnce RFID Bloklu",cat:"📱 Elektronik",fob:6.5,tr:860,gtip:"4202.31.00.00",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80",q:"Titanium+Slim+Wallet+RFID+Block"},
+  {id:"x014",title:"Güneş Enerji Bahçe Lambası 6'lı Set Solar",cat:"🏡 Ev & Yaşam",fob:5.8,tr:760,gtip:"9405.40.35.00",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",q:"Solar+Garden+Lights+6+Pack"},
+  {id:"x015",title:"Taşınabilir Espresso Makinesi Manuel El Pompası",cat:"🏡 Ev & Yaşam",fob:9.8,tr:1300,gtip:"8516.71.00.00",img:"https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80",q:"Portable+Espresso+Maker+Manual"},
+  {id:"x016",title:"Parmak İzi Akıllı Kilit Kapı Biyometrik",cat:"📱 Elektronik",fob:24.5,tr:3250,gtip:"8301.10.00.00",img:"https://images.unsplash.com/photo-1558002038-1055907df827?w=400&q=80",q:"Fingerprint+Smart+Door+Lock+Biometric"},
+  {id:"x017",title:"Mini Soğuk Sıkım Katı İçecek Makinası Portable",cat:"🏡 Ev & Yaşam",fob:21.5,tr:2850,gtip:"8509.40.00.00",img:"https://images.unsplash.com/photo-1563746098251-d35aef196e83?w=400&q=80",q:"Cold+Press+Juicer+Portable+Mini"},
+  {id:"x018",title:"Yıkama Makinası Küçük Boy Bebek 3kg",cat:"🏡 Ev & Yaşam",fob:38.5,tr:5100,gtip:"8450.11.91.00",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",q:"Mini+Washing+Machine+Baby+3kg"},
+  {id:"x019",title:"Balıkçı Güneş Şapkası UV50+ Boyun Korumalı",cat:"⛺ Outdoor & Spor",fob:4.5,tr:590,gtip:"6504.00.00.00",img:"https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&q=80",q:"Fishing+Sun+Hat+UV50+Neck+Flap"},
+  {id:"x020",title:"Akıllı Priz Enerji Monitörlü Zaman Ayarlı",cat:"📱 Elektronik",fob:6.5,tr:860,gtip:"8536.69.90.00",img:"https://images.unsplash.com/photo-1558089687-f282ffcbc0d3?w=400&q=80",q:"Smart+Plug+Energy+Monitor+Timer"},
+  {id:"x021",title:"Tahta Oyun Seti Zeka Küpleri 500 Parça",cat:"👶 Bebek & Çocuk",fob:9.8,tr:1300,gtip:"9503.00.10.00",img:"https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&q=80",q:"Wooden+Brain+Puzzle+Blocks+500"},
+  {id:"x022",title:"Akupresür Masaj Matı Yastık Seti Lotus",cat:"💄 Güzellik & Sağlık",fob:8.2,tr:1080,gtip:"9019.10.90.00",img:"https://images.unsplash.com/photo-1614159102492-8fe02ed4e0e1?w=400&q=80",q:"Acupressure+Massage+Mat+Pillow+Lotus"},
+  {id:"x023",title:"Şişme SUP Kürek Sörfü Tam Set 10'6",cat:"⛺ Outdoor & Spor",fob:55,tr:7400,gtip:"9506.29.90.00",img:"https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=400&q=80",q:"Inflatable+SUP+Paddle+Board+Full+Set"},
+  {id:"x024",title:"Bebek Yürüteç Yay Önlüklü Aktivite Merkezi",cat:"👶 Bebek & Çocuk",fob:18.5,tr:2450,gtip:"9401.89.00.00",img:"https://images.unsplash.com/photo-1555252333-9f8e92e65df9?w=400&q=80",q:"Baby+Walker+Activity+Center+Spring"},
+  {id:"x025",title:"Paslanmaz Çelik Termos Kupa Tutmalı 380ml",cat:"🏡 Ev & Yaşam",fob:4.8,tr:630,gtip:"9617.00.00.00",img:"https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400&q=80",q:"Stainless+Steel+Thermos+Mug+Handle"}
+];
+
+// ============================================================
+// AI SCORING ENGINE (6 Factor Analysis)
+// ============================================================
+function calcAI(item) {
+  const landed = Math.round((item.fob * USD_RATE * 1.5) + 40);
+  const commission = Math.round(item.tr * 0.18);
+  const cargo = 45;
+  const netProfit = item.tr - landed - commission - cargo;
+  const margin = Math.round((netProfit / item.tr) * 100);
+
+  // Factor 1: Net Margin (30 pts)
+  let f1 = 0;
+  if (margin >= 60) f1 = 30;
+  else if (margin >= 45) f1 = 24;
+  else if (margin >= 30) f1 = 16;
+  else if (margin >= 15) f1 = 8;
+
+  // Factor 2: ROI (20 pts)
+  const roi = netProfit / landed * 100;
+  let f2 = 0;
+  if (roi >= 200) f2 = 20;
+  else if (roi >= 150) f2 = 16;
+  else if (roi >= 100) f2 = 12;
+  else if (roi >= 50) f2 = 6;
+
+  // Factor 3: Price range sweet spot ₺300-₺3000 (15 pts)
+  let f3 = (item.tr >= 300 && item.tr <= 3000) ? 15 : (item.tr < 300 ? 5 : 10);
+
+  // Factor 4: FOB low risk < $20 (15 pts)
+  let f4 = item.fob < 10 ? 15 : item.fob < 20 ? 10 : item.fob < 50 ? 5 : 2;
+
+  // Factor 5: TikTok viral potential (10 pts)
+  const viralCats = ["💄 Güzellik & Sağlık","🏋️ Fitness","🐾 Pet Tech","👶 Bebek & Çocuk"];
+  let f5 = viralCats.includes(item.cat) ? 10 : 6;
+
+  // Factor 6: Competition (10 pts) — lower fob = less competition generally
+  let f6 = item.fob < 8 ? 10 : item.fob < 15 ? 7 : 4;
+
+  const total = Math.min(100, f1 + f2 + f3 + f4 + f5 + f6);
+  const label = total >= 92 ? "🔥 Efsane" : total >= 80 ? "⭐ Mükemmel" : total >= 65 ? "✅ Çok İyi" : "📊 İyi";
+  return { score: total, label, netProfit, margin, landed, commission, cargo, roi: Math.round(roi) };
+}
+
+function tiktokScore(item) {
+  const viral = ["💄 Güzellik & Sağlık","🏋️ Fitness","🐾 Pet Tech","👶 Bebek & Çocuk","📱 Elektronik"];
+  const base = viral.includes(item.cat) ? 75 : 45;
+  return Math.min(99, base + Math.floor(Math.random() * 20));
+}
+
+function trCompetition(item) {
+  const scores = {"📱 Elektronik":"Orta 🟡","🏡 Ev & Yaşam":"Düşük 🟢","💄 Güzellik & Sağlık":"Orta 🟡","⛺ Outdoor & Spor":"Düşük 🟢","🐾 Pet Tech":"Çok Az 🟢","🚗 Araç & Oto":"Orta 🟡","👶 Bebek & Çocuk":"Düşük 🟢","🏋️ Fitness":"Yüksek 🔴"};
+  return scores[item.cat] || "Bilinmiyor";
+}
+
+function fbaWeight(item) {
+  return (item.fob < 5 ? 0.3 : item.fob < 15 ? 0.8 : item.fob < 30 ? 2.1 : 5.4).toFixed(1) + " desi";
+}
+
+// ============================================================
+// SCAN LOOP
+// ============================================================
+let scanIndex = 0;
+let scanPool = [...DB]; // shuffle once per session
+function shufflePool() {
+  for (let i = scanPool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [scanPool[i], scanPool[j]] = [scanPool[j], scanPool[i]];
+  }
+}
+shufflePool();
+
+// ============================================================
+// BAŞLAT: Önce gerçek TCMB kurunı çek, sonra state'i yükle
+// ============================================================
+async function initApp() {
+  // Gerçek TCMB kuru
+  try {
+    const r = await fetch('/api/rate');
+    if (r.ok) {
+      const d = await r.json();
+      USD_RATE = d.rate;
+      const badge = document.getElementById('dolar-badge');
+      const src = d.source === 'fallback' ? '(tahmini)' : '(TCMB Canlı)';
+      if (badge) badge.innerHTML = `💵 $1 = ₺${USD_RATE.toFixed(2)} <span style="font-size:.65rem;color:#64748b">${src}</span>`;
+      console.log(`[TCMB] Gerçek kur: ₺${USD_RATE}`);
+    }
+  } catch(e) { console.warn('TCMB rate alınamadı:', e.message); }
+
+  // State yükle
+  await loadState();
+
+  // Tabloları render et
+  renderArchive();
+  updateStats();
+  renderTop10();
+}
+
+initApp();
+
+const SCAN_INTERVAL = setInterval(scanLoop, 2800);
+
+function scanLoop() {
+  if (!isScanning) return;
+  if (todayScanCount >= DAILY_LIMIT) {
+    document.getElementById("limit-banner").style.display = "block";
+    document.getElementById("bot-status").textContent = "✅ Günlük 100 Tarama Tamamlandı — Yarın 09:00'da Devam";
+    clearInterval(SCAN_INTERVAL);
+    return;
+  }
+  if (scanIndex >= scanPool.length) {
+    // All pool items checked — reshuffle but only unseen ones will pass
+    shufflePool();
+    scanIndex = 0;
+    // Safety: if everything is archived, stop
+    if (archiveSet.size >= DB.length) {
+      document.getElementById("bot-status").textContent = "✅ Tüm Ürünler Tarandı — Veri Tabanı Tam";
+      document.getElementById("limit-banner").style.display = "block";
+      clearInterval(SCAN_INTERVAL);
+      return;
+    }
+  }
+
+  const item = scanPool[scanIndex++];
+  if (archiveSet.has(item.id)) {
+    skippedCount++;
+    document.getElementById("s-skip").textContent = skippedCount;
+    return;
+  }
+
+  // NEW UNIQUE ITEM — process it
+  const ai = calcAI(item);
+  const enriched = { ...item, ...ai, tikTok: tiktokScore(item), trComp: trCompetition(item), fbaW: fbaWeight(item), ts: new Date().toLocaleString('tr-TR') };
+
+  archiveSet.add(item.id);
+  archiveList.unshift(enriched);
+  todayScanCount++;
+  saveState();
+
+  addLiveRow(enriched);
+  addArchiveRow(enriched);
+  updateStats();
+  renderTop10();
+  updateTicker(enriched);
+  highlightCat(item.cat);
+}
+
+function addLiveRow(p) {
+  const body = document.getElementById("live-body");
+  if (!body) return;
+  const scoreColor = p.score >= 85 ? "#34d399" : p.score >= 70 ? "#fbbf24" : "#f87171";
+  const row = `<tr class="new-row">
+    <td><strong style="color:#64748b">${todayScanCount}</strong></td>
+    <td><img src="${p.img}" class="thumb" onerror="this.src='https://via.placeholder.com/46x46/1e293b/64748b?text=IMG'"></td>
+    <td>
+      <strong style="color:#f1f5f9;display:block;font-size:.82rem">${p.title}</strong>
+      <span class="badge b-purple" style="margin-top:3px">${p.cat}</span>
+    </td>
+    <td><span class="badge b-blue">${p.gtip}</span></td>
+    <td><strong>$${p.fob.toFixed(2)}</strong></td>
+    <td><strong style="color:#38bdf8">₺${p.tr.toLocaleString()}</strong></td>
+    <td><span style="color:#fbbf24">₺${p.landed.toLocaleString()}</span></td>
+    <td>
+      <strong style="color:#34d399;display:block">₺${p.netProfit.toLocaleString()}</strong>
+      <span class="badge b-green">%${p.margin} Marj</span>
+    </td>
+    <td>
+      <strong style="color:${scoreColor}">${p.score}/100</strong>
+      <div class="score-bar"><div class="score-fill" style="width:${p.score}%;background:${scoreColor}"></div></div>
+      <div style="font-size:.68rem;color:#64748b;margin-top:2px">${p.label}</div>
+    </td>
+    <td><span class="badge b-red">🔥 ${p.tikTok}%</span></td>
+    <td><span style="font-size:.75rem">${p.trComp}</span></td>
+    <td><span class="badge b-orange">${p.fbaW}</span></td>
+    <td>
+      <button class="btn btn-orange btn-sm" onclick="openRfq('${p.title.replace(/'/g,"\\'")}',${p.fob},'${p.q}')">📄 RFQ</button>
+    </td>
+  </tr>`;
+  body.insertAdjacentHTML("afterbegin", row);
+}
+
+function addArchiveRow(p) {
+  const body = document.getElementById("archive-body");
+  document.getElementById("archive-empty").style.display = "none";
+  if (!body) return;
+  const row = `<tr>
+    <td style="font-size:.72rem;color:#475569">${p.ts}</td>
+    <td><img src="${p.img}" class="thumb" onerror="this.src='https://via.placeholder.com/46x46/1e293b/64748b?text=IMG'"></td>
+    <td><strong style="font-size:.8rem">${p.title}</strong></td>
+    <td><span class="badge b-purple">${p.cat}</span></td>
+    <td>$${p.fob.toFixed(2)}</td>
+    <td style="color:#38bdf8">₺${p.tr.toLocaleString()}</td>
+    <td style="color:#34d399"><strong>₺${p.netProfit.toLocaleString()}</strong></td>
+    <td><span class="badge b-green">%${p.margin}</span></td>
+    <td><strong style="color:${p.score>=85?'#34d399':p.score>=70?'#fbbf24':'#f87171'}">${p.score}/100 ${p.label}</strong></td>
+    <td><span class="badge b-blue">${p.gtip}</span></td>
+    <td><a href="https://www.alibaba.com/trade/search?SearchText=${p.q}" target="_blank" class="btn btn-sm btn-orange" style="text-decoration:none">↗ Alibaba</a></td>
+  </tr>`;
+  body.insertAdjacentHTML("afterbegin", row);
+}
+
+function renderArchive() {
+  const body = document.getElementById("archive-body");
+  const empty = document.getElementById("archive-empty");
+  if (!body) return;
+  body.innerHTML = "";
+  if (archiveList.length === 0) {
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+  archiveList.forEach(p => {
+    if (!p.netProfit) { const ai = calcAI(p); Object.assign(p, ai); }
+    if (!p.tikTok) p.tikTok = tiktokScore(p);
+    if (!p.trComp) p.trComp = trCompetition(p);
+    if (!p.fbaW) p.fbaW = fbaWeight(p);
+    if (!p.ts) p.ts = "—";
+    addArchiveRowDirect(p, body);
+  });
+}
+
+function addArchiveRowDirect(p, body) {
+  const row = `<tr>
+    <td style="font-size:.72rem;color:#475569">${p.ts||'—'}</td>
+    <td><img src="${p.img}" class="thumb" onerror="this.src='https://via.placeholder.com/46x46/1e293b/64748b?text=IMG'"></td>
+    <td><strong style="font-size:.8rem">${p.title}</strong></td>
+    <td><span class="badge b-purple">${p.cat}</span></td>
+    <td>$${p.fob.toFixed(2)}</td>
+    <td style="color:#38bdf8">₺${p.tr.toLocaleString()}</td>
+    <td style="color:#34d399"><strong>₺${(p.netProfit||0).toLocaleString()}</strong></td>
+    <td><span class="badge b-green">%${p.margin||0}</span></td>
+    <td><strong style="color:${(p.score||0)>=85?'#34d399':(p.score||0)>=70?'#fbbf24':'#f87171'}">${p.score||0}/100</strong></td>
+    <td><span class="badge b-blue">${p.gtip}</span></td>
+    <td><a href="https://www.alibaba.com/trade/search?SearchText=${p.q}" target="_blank" class="btn btn-sm btn-orange" style="text-decoration:none">↗ Alibaba</a></td>
+  </tr>`;
+  body.insertAdjacentHTML("beforeend", row);
+}
+
+function renderTop10() {
+  const grid = document.getElementById("top10-grid");
+  if (!grid) return;
+  if (archiveList.length === 0) return;
+
+  const sorted = [...archiveList].sort((a,b) => (b.score||0) - (a.score||0)).slice(0,10);
+  if (sorted.length === 0) return;
+
+  grid.innerHTML = sorted.map((p, i) => {
+    const ai = p.netProfit !== undefined ? p : Object.assign(p, calcAI(p));
+    const rankClass = i === 0 ? "rank-1" : i === 1 ? "rank-2" : i === 2 ? "rank-3" : "";
+    const rankIcon = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i+1}`;
+    const scoreColor = (p.score||0) >= 85 ? "#34d399" : (p.score||0) >= 70 ? "#fbbf24" : "#f87171";
+    return `<div class="card ${rankClass} fade-in">
+      <div class="rank-badge" style="background:${i<3?'rgba(245,158,11,.2)':'rgba(99,102,241,.2)'};color:${i<3?'#fbbf24':'#a78bfa'}">${rankIcon}</div>
+      <img src="${p.img}" class="card-img" onerror="this.src='https://via.placeholder.com/280x130/111827/64748b?text=IMG'">
+      <div class="card-title">${p.title}</div>
+      <div style="margin-bottom:8px"><span class="badge b-purple">${p.cat}</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.75rem;margin-bottom:10px">
+        <div style="background:#0a1221;padding:6px;border-radius:8px;text-align:center">
+          <div style="color:#64748b;font-size:.65rem">FOB ALIŞ</div>
+          <strong style="color:#f1f5f9">$${p.fob.toFixed(2)}</strong>
+        </div>
+        <div style="background:#0a1221;padding:6px;border-radius:8px;text-align:center">
+          <div style="color:#64748b;font-size:.65rem">TR SATIŞ</div>
+          <strong style="color:#38bdf8">₺${p.tr.toLocaleString()}</strong>
+        </div>
+        <div style="background:#0a1221;padding:6px;border-radius:8px;text-align:center">
+          <div style="color:#64748b;font-size:.65rem">NET KÂR</div>
+          <strong style="color:#34d399">₺${(p.netProfit||0).toLocaleString()}</strong>
+        </div>
+        <div style="background:#0a1221;padding:6px;border-radius:8px;text-align:center">
+          <div style="color:#64748b;font-size:.65rem">KÂR MARJI</div>
+          <strong style="color:#fbbf24">%${p.margin||0}</strong>
+        </div>
+      </div>
+      <div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:3px">
+          <span style="color:#64748b">YZ AI Skoru</span>
+          <strong style="color:${scoreColor}">${p.score||0}/100 — ${p.label||''}</strong>
+        </div>
+        <div class="score-bar"><div class="score-fill" style="width:${p.score||0}%;background:${scoreColor}"></div></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;font-size:.72rem">
+        <span class="badge b-red">🔥 TikTok ${p.tikTok||'-'}%</span>
+        <span class="badge b-green">${p.trComp||'—'}</span>
+        <span class="badge b-orange">${p.fbaW||'—'}</span>
+      </div>
+      <button class="btn btn-orange btn-sm" style="width:100%;justify-content:center" onclick="openRfq('${p.title.replace(/'/g,"\\'")}',${p.fob},'${p.q}')">📄 RFQ Pazarlık Taslağı ↗</button>
+    </div>`;
+  }).join('');
+}
+
+function updateStats() {
+  document.getElementById("s-scanned").textContent = todayScanCount;
+  document.getElementById("s-skip").textContent = skippedCount;
+  document.getElementById("s-archive").textContent = archiveList.length;
+  document.getElementById("scan-count-tab").textContent = todayScanCount;
+  document.getElementById("archive-count-tab").textContent = archiveList.length;
+}
+
+function updateTicker(p) {
+  const el = document.getElementById("ticker-box");
+  if (el) el.innerHTML = `[${new Date().toLocaleTimeString('tr-TR')}] 🟢 <strong style="color:${p.score>=85?'#34d399':'#fbbf24'}">${p.cat}</strong>: ${p.title} → YZ Skoru: <strong style="color:#34d399">${p.score}/100 ${p.label}</strong> — Net Kâr: <strong style="color:#38bdf8">₺${(p.netProfit||0).toLocaleString()}</strong> — Marj: <strong style="color:#fbbf24">%${p.margin||0}</strong>`;
+  const mainEl = document.getElementById("ticker-main");
+  if (mainEl) mainEl.textContent = `Son: ${p.title} | Skor: ${p.score}/100 | Kâr: ₺${(p.netProfit||0).toLocaleString()}`;
+}
+
+function highlightCat(cat) {
+  document.querySelectorAll(".chip").forEach(c => {
+    c.classList.toggle("active-chip", c.dataset.cat === cat);
+  });
+}
+
+// CLOCK
+setInterval(() => {
+  document.getElementById("clock").textContent = new Date().toLocaleTimeString('tr-TR');
+}, 1000);
+
+// TCMB rate (static but displayed)
+(function() {
+  const el = document.getElementById("dolar-badge");
+  if (el) el.innerHTML = `💵 $1 = ₺${USD_RATE.toFixed(2)} <span style="font-size:.65rem;color:#64748b">(TCMB)</span>`;
+})();
+
+// 09:00 auto email check
+setInterval(() => {
+  const now = new Date();
+  if (now.getHours() === 9 && now.getMinutes() === 0 && now.getSeconds() < 3) {
+    sendMail();
+  }
+}, 1000);
+
+// ============================================================
+// UI FUNCTIONS
+// ============================================================
+function goTab(tab) {
+  ["top10","live","archive"].forEach(t => {
+    document.getElementById("v-"+t).style.display = t===tab ? "block" : "none";
+    document.getElementById("t-"+t).classList.toggle("on", t===tab);
+  });
+}
+
+function toggleScan() {
+  isScanning = !isScanning;
+  const btn = document.getElementById("btn-pause");
+  btn.textContent = isScanning ? "⏸️ Duraklat" : "▶️ Başlat";
+  document.getElementById("bot-status").textContent = isScanning ? "🤖 YZ MOTORİ ÇALIŞIYOR..." : "⏸️ TARAMA DURAKLATILDI";
+}
+
+function openModal(id) {
+  document.getElementById("m-"+id).classList.add("on");
+}
+function closeModal(id) {
+  document.getElementById("m-"+id).classList.remove("on");
+}
+
+function openRfq(title, fob, q) {
+  document.getElementById("rfq-area").value = `Dear Supplier Sales Manager,
+
+My name is Faruk Baş, Procurement Manager at TradePulse TR.
+We are very interested in sourcing: "${title}"
+
+RFQ Request:
+1. Sample Quantity: 5-10 units (Quality Inspection)
+2. Initial Commercial Order: 500-1,000 units
+3. Target FOB Price: $${(fob*0.88).toFixed(2)}/unit (12% below your listed price)
+4. Required Certificates: CE, RoHS, FDA, FCC (with Test Reports)
+5. Packaging: Custom brand label (OEM)
+6. Shipping: DDP Istanbul, Turkey (Air + Sea)
+7. Payment: 30% deposit, 70% before shipment
+
+Please provide your best offer and product catalog.
+
+Best Regards,
+Faruk Baş | TradePulse TR
+isb.faruk.bas@gmail.com`;
+  document.getElementById("rfq-link").href = `https://www.alibaba.com/trade/search?SearchText=${q}`;
+  openModal("rfq");
+}
+
+function copyRfq() {
+  const t = document.getElementById("rfq-area");
+  t.select();
+  document.execCommand("copy");
+  alert("✅ RFQ Pazarlık Mesajı Panoya Kopyalandı!");
+}
+
+function sendWA() {
+  const phone = document.getElementById("wa-phone").value.trim();
+  const key = document.getElementById("wa-key").value.trim();
+  if (!phone || !key) { alert("Telefon ve API Key giriniz!"); return; }
+  const top = archiveList.slice(0,3).map((p,i) => `${i+1}. ${p.title} — Net Kâr: ₺${(p.netProfit||0).toLocaleString()} (%${p.margin||0} Marj)`).join("\n");
+  const msg = encodeURIComponent(`🔥 TradePulse TR Yapay Zeka Raporu\n\nBugünkü TOP 3:\n${top}\n\nToplam ${todayScanCount} ürün tarandı.`);
+  fetch(`https://api.callmebot.com/whatsapp.php?phone=${phone}&text=${msg}&apikey=${key}`,{mode:"no-cors"})
+    .then(()=>{ alert(`✅ WhatsApp Mesajı Gönderildi!\nAlıcı: ${phone}`); closeModal("wa"); })
+    .catch(e=>alert("Hata: "+e.message));
+}
+
+function dlExcel() {
+  let csv = "\uFEFF";
+  csv += "Sıra;Ürün Adı;Kategori;GTİP;FOB($);TR Satış(₺);Gümrük Maliyet(₺);Komisyon %18(₺);Kargo(₺);Net Kâr(₺);Kâr Marjı(%);YZ Skoru;TikTok Viral(%);TR Rekabeti;FBA Desi;Tarama Zamanı\n";
+  archiveList.forEach((p,i) => {
+    csv += `${i+1};"${p.title}";"${p.cat}";"${p.gtip}";${p.fob};${p.tr};${p.landed||0};${p.commission||0};${p.cargo||45};${p.netProfit||0};${p.margin||0};${p.score||0};${p.tikTok||0};"${p.trComp||''}";${p.fbaW||''};${p.ts||''}\n`;
+  });
+  const blob = new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = `TradePulse_TR_Rapor_${new Date().toLocaleDateString('tr-TR').replace(/\./g,'-')}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+
+function sendMail() {
+  const top5 = archiveList.sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,5)
+    .map((p,i) => `${i+1}. ${p.title}\n   Kâr: ₺${(p.netProfit||0).toLocaleString()} | Marj: %${p.margin||0} | YZ: ${p.score||0}/100`).join("\n\n");
+
+  fetch(`https://formsubmit.co/ajax/${FORM_KEY}`, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      _subject: `🏆 TradePulse TR — Günlük Top 10 YZ Ticaret Raporu (${new Date().toLocaleDateString('tr-TR')})`,
+      email: "isb.faruk.bas@gmail.com",
+      message: `Sayın Faruk Baş,\n\nYapay Zekâ Risk Motorumuz bugün ${todayScanCount} ürün taradı.\n\n🏆 TOP 5 ŞAMPİYON ÜRÜN:\n\n${top5}\n\nDetaylı rapor için sisteme giriş yapın veya Excel indirin.\n\nSaygılarımızla,\nTradePulse TR Yapay Zekâ Sistemi`
+    })
+  }).then(r=>r.json()).then(()=>{
+    alert(`✅ Günlük YZ Raporu E-Posta ile Gönderildi!\n\nAlıcı: isb.faruk.bas@gmail.com`);
+  }).catch(e=>alert("Hata: "+e.message));
+}
+</script>
+</body>
+</html>

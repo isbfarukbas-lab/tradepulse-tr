@@ -1,0 +1,19 @@
+{
+  "name": "tradepulse-tr",
+  "version": "2.0.0",
+  "description": "TradePulse TR — Yapay Zeka Ticaret ve Risk Analiz Motoru",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-cron": "^3.0.3",
+    "node-fetch": "^2.7.0",
+    "xml2js": "^0.6.2"
+  }
+}

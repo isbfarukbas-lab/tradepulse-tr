@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: tradepulse-tr
+    env: node
+    plan: starter          # $7/ay — 7/24 uyumadan çalışır
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /api/ping
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
