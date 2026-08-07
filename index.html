@@ -830,7 +830,7 @@ function genDynProduct(){
   const adj=["Premium","Pro","Smart","Ultra","Mini","Eco","Akıllı","Portable"];
   const noun=["Gadget","Cihaz","Set","Kit","Aksesuar","Sistem","Alet"];
   const id=`d${Date.now()%99999}`;
-  return{id,title:`${adj[id.length%adj.length]} ${cat.split(' ')[1]||'Ürün'} ${noun[id.length%noun.length]}`,cat,fob,tr,gtip:"9999.99.99.00",img:`https://images.unsplash.com/photo-${1500000000000+Math.floor(Math.random()*200000000)}?w=400&q=80`,q:`Smart+Product+${cat}`};
+  return{id,title:`${adj[id.length%adj.length]} ${cat.split(' ')[1]||'Ürün'} ${noun[id.length%noun.length]}`,cat,fob,tr,gtip:"9999.99.99.00",img:`https://loremflickr.com/400/400/product?lock=${Math.floor(Math.random()*1000)}`,q:`Smart+Product+${cat}`};
 }
 
 async function scanLoop(){
@@ -886,7 +886,7 @@ function addLiveRow(p){
   const mb2=mg>=50?'bg':mg>=30?'ba':'br';
   const sc2=sc>=85?'#34d399':sc>=70?'#fbbf24':'#94a3b8';
   const tr=document.createElement('tr');tr.className='nr';
-  tr.innerHTML=`<td><div style="display:flex;align-items:center;gap:7px"><img src="${p.img||''}" class="th" onerror="this.src=''" alt=""><div style="max-width:165px"><div style="font-weight:700;font-size:.73rem;line-height:1.3;margin-bottom:3px">${p.title||'—'}</div><button class="btn btn-gh xs" style="padding:2px 6px;font-size:.6rem" onclick="openCustMod('${p.id}')">⚖️ GTİP: ${p.gtip||'Belirsiz'}</button></div></div></td>
+  tr.innerHTML=`<td><div style="display:flex;align-items:center;gap:7px"><img src="${p.img||''}" class="th" onerror="this.onerror=null;this.src='https://loremflickr.com/400/400/product?lock=' + Math.floor(Math.random()*1000)" alt=""><div style="max-width:165px"><div style="font-weight:700;font-size:.73rem;line-height:1.3;margin-bottom:3px">${p.title||'—'}</div><button class="btn btn-gh xs" style="padding:2px 6px;font-size:.6rem" onclick="openCustMod('${p.id}')">⚖️ GTİP: ${p.gtip||'Belirsiz'}</button></div></div></td>
     <td><span class="b bac" style="font-size:.58rem">${p.cat||'—'}</span></td>
     <td style="font-weight:700;color:#38bdf8">$${(p.fob||0).toFixed(2)}</td>
     <td style="font-weight:700">₺${(p.tr||0).toLocaleString()}</td>
@@ -932,7 +932,7 @@ function renderArchive(){
     const sc2=sc>=85?'#34d399':sc>=70?'#fbbf24':'#94a3b8';
     const tr=document.createElement('tr');
     tr.innerHTML=`<td style="color:var(--text3);font-weight:700">${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:7px"><img src="${p.img||''}" class="th" onerror="this.src=''" alt=""><div style="max-width:150px"><div style="font-weight:700;font-size:.72rem;line-height:1.3;margin-bottom:3px">${p.title||'—'}</div><button class="btn btn-gh xs" style="padding:2px 6px;font-size:.6rem" onclick="openCustMod('${p.id}')">⚖️ GTİP: ${p.gtip||'Belirsiz'}</button></div></div></td>
+      <td><div style="display:flex;align-items:center;gap:7px"><img src="${p.img||''}" class="th" onerror="this.onerror=null;this.src='https://loremflickr.com/400/400/product?lock=' + Math.floor(Math.random()*1000)" alt=""><div style="max-width:150px"><div style="font-weight:700;font-size:.72rem;line-height:1.3;margin-bottom:3px">${p.title||'—'}</div><button class="btn btn-gh xs" style="padding:2px 6px;font-size:.6rem" onclick="openCustMod('${p.id}')">⚖️ GTİP: ${p.gtip||'Belirsiz'}</button></div></div></td>
       <td><span class="b bac" style="font-size:.57rem">${p.cat||'—'}</span></td>
       <td style="color:#38bdf8;font-weight:700">$${(p.fob||0).toFixed(2)}</td>
       <td style="font-weight:700">₺${(p.tr||0).toLocaleString()}</td>
@@ -983,7 +983,7 @@ function renderTop10(){
     const mg=isNaN(p.margin)?0:(p.margin||0);
     const sc=isNaN(p.score)?0:(p.score||0);
     return`<div class="pcard r${i+1}">
-      <div style="position:relative"><img class="cimg" src="${p.img||''}" onerror="this.src=''" alt=""><div class="crnk">${med[i]||'#'+(i+1)}</div></div>
+      <div style="position:relative"><img class="cimg" src="${p.img||''}" onerror="this.onerror=null;this.src='https://loremflickr.com/400/400/product?lock=' + Math.floor(Math.random()*1000)" alt=""><div class="crnk">${med[i]||'#'+(i+1)}</div></div>
       <div class="cbody">
         <div class="ccat">${p.cat||''}</div>
         <div class="ctit">${p.title||'—'}</div>
@@ -1019,9 +1019,9 @@ function updateDashMetrics(){
     if(p && rl.dataset.lastId !== p.id){
       if(!rl.children.length){
         const rc=archiveList.slice(0,6);
-        rl.innerHTML=rc.map(x=>`<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)"><img src="${x.img||''}" style="width:36px;height:36px;border-radius:7px;object-fit:cover;flex-shrink:0" onerror="this.src=''" alt=""><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x.title||'—'}</div><div style="font-size:.65rem;color:var(--text2)">${x.cat} · ₺${(x.netProfit||0).toLocaleString()} kâr · ${x.trendLabel||''}</div></div><div style="font-weight:800;color:${(x.score||0)>=85?'#34d399':(x.score||0)>=70?'#fbbf24':'#94a3b8'};font-size:.88rem;flex-shrink:0">${x.score||0}</div></div>`).join('');
+        rl.innerHTML=rc.map(x=>`<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)"><img src="${x.img||''}" style="width:36px;height:36px;border-radius:7px;object-fit:cover;flex-shrink:0" onerror="this.onerror=null;this.src='https://loremflickr.com/400/400/product?lock=' + Math.floor(Math.random()*1000)" alt=""><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x.title||'—'}</div><div style="font-size:.65rem;color:var(--text2)">${x.cat} · ₺${(x.netProfit||0).toLocaleString()} kâr · ${x.trendLabel||''}</div></div><div style="font-weight:800;color:${(x.score||0)>=85?'#34d399':(x.score||0)>=70?'#fbbf24':'#94a3b8'};font-size:.88rem;flex-shrink:0">${x.score||0}</div></div>`).join('');
       } else {
-        rl.insertAdjacentHTML('afterbegin', `<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)"><img src="${p.img||''}" style="width:36px;height:36px;border-radius:7px;object-fit:cover;flex-shrink:0" onerror="this.src=''" alt=""><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title||'—'}</div><div style="font-size:.65rem;color:var(--text2)">${p.cat} · ₺${(p.netProfit||0).toLocaleString()} kâr · ${p.trendLabel||''}</div></div><div style="font-weight:800;color:${(p.score||0)>=85?'#34d399':(p.score||0)>=70?'#fbbf24':'#94a3b8'};font-size:.88rem;flex-shrink:0">${p.score||0}</div></div>`);
+        rl.insertAdjacentHTML('afterbegin', `<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)"><img src="${p.img||''}" style="width:36px;height:36px;border-radius:7px;object-fit:cover;flex-shrink:0" onerror="this.onerror=null;this.src='https://loremflickr.com/400/400/product?lock=' + Math.floor(Math.random()*1000)" alt=""><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title||'—'}</div><div style="font-size:.65rem;color:var(--text2)">${p.cat} · ₺${(p.netProfit||0).toLocaleString()} kâr · ${p.trendLabel||''}</div></div><div style="font-weight:800;color:${(p.score||0)>=85?'#34d399':(p.score||0)>=70?'#fbbf24':'#94a3b8'};font-size:.88rem;flex-shrink:0">${p.score||0}</div></div>`);
         if(rl.children.length>6) rl.removeChild(rl.lastChild);
       }
       rl.dataset.lastId = p.id;
@@ -1097,7 +1097,7 @@ function renderStockPage(){
     const col=document.getElementById("kk"+i);const cnt=document.getElementById("kc"+i);
     const items=orderData.filter(o=>o.stage===i);
     if(cnt)cnt.textContent=items.length;
-    if(col){col.innerHTML='';items.forEach(o=>{const d=document.createElement('div');d.className='kbcard';d.innerHTML=`<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px"><img src="${o.img||''}" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0" onerror="this.src=''" alt=""><div class="kbtit">${o.title||'—'}</div></div><div class="kbmeta">$${o.fob||0} · ₺${(o.netProfit||0).toLocaleString()} kâr</div><div style="display:flex;gap:3px;margin-top:5px">${o.stage>0?`<button class="btn btn-gh xs" onclick="moveStage('${o.id}',-1)">←</button>`:''}<button class="btn btn-p xs" onclick="moveStage('${o.id}',1)" ${o.stage>=4?'disabled style="opacity:.4"':''}>İlerle →</button><button class="btn btn-r xs" onclick="removeOrder('${o.id}')">✕</button></div>`;col.appendChild(d);});}
+    if(col){col.innerHTML='';items.forEach(o=>{const d=document.createElement('div');d.className='kbcard';d.innerHTML=`<div style="display:flex;align-items:center;gap:5px;margin-bottom:3px"><img src="${o.img||''}" style="width:26px;height:26px;border-radius:5px;object-fit:cover;flex-shrink:0" onerror="this.onerror=null;this.src='https://loremflickr.com/400/400/product?lock=' + Math.floor(Math.random()*1000)" alt=""><div class="kbtit">${o.title||'—'}</div></div><div class="kbmeta">$${o.fob||0} · ₺${(o.netProfit||0).toLocaleString()} kâr</div><div style="display:flex;gap:3px;margin-top:5px">${o.stage>0?`<button class="btn btn-gh xs" onclick="moveStage('${o.id}',-1)">←</button>`:''}<button class="btn btn-p xs" onclick="moveStage('${o.id}',1)" ${o.stage>=4?'disabled style="opacity:.4"':''}>İlerle →</button><button class="btn btn-r xs" onclick="removeOrder('${o.id}')">✕</button></div>`;col.appendChild(d);});}
   }
   const em=document.getElementById("stk-empty");if(em)em.style.display=orderData.length?'none':'block';
   const ss=document.getElementById("stk-stats");
@@ -1129,7 +1129,7 @@ function checkAllComp(){
 function renderCompPage(){
   const el=document.getElementById("comp-list");if(!el)return;
   if(!compList.length){el.innerHTML='<div class="empty"><div class="ei">🎯</div><p>Henüz takip yok. Arşivdeki ürünlere <strong>🎯</strong> butonuyla ekleyin.</p></div>';return;}
-  el.innerHTML=compList.map(c=>{const diff=c.compPrice-c.ourPrice;const dp=Math.round((diff/c.ourPrice)*100);const st=diff<0?'dn':'up';return`<div class="cc"><img src="${c.img||''}" style="width:46px;height:46px;border-radius:8px;object-fit:cover;flex-shrink:0" onerror="this.src=''" alt=""><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.8rem;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.title||'—'}</div><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-size:.7rem;color:var(--text3)">Bizim: <strong style="color:var(--text)">₺${c.ourPrice.toLocaleString()}</strong></span><span style="font-size:.7rem;color:var(--text3)">Rakip: <strong style="color:var(--text)">₺${c.compPrice.toLocaleString()}</strong></span><span class="pcd ${st}" style="font-size:.72rem;font-weight:700">${diff<0?'⬇️':'⬆️'} ${Math.abs(dp)}% (₺${Math.abs(diff).toLocaleString()})</span></div><div style="font-size:.6rem;color:var(--text3)">Son: ${new Date(c.lastChecked).toLocaleString('tr-TR')}</div></div><div style="display:flex;gap:3px;flex-shrink:0"><button class="btn btn-gh xs" onclick="checkAllComp()">🔄</button><button class="btn btn-r xs" onclick="removeComp('${c.id}')">✕</button></div></div>`;}).join('');
+  el.innerHTML=compList.map(c=>{const diff=c.compPrice-c.ourPrice;const dp=Math.round((diff/c.ourPrice)*100);const st=diff<0?'dn':'up';return`<div class="cc"><img src="${c.img||''}" style="width:46px;height:46px;border-radius:8px;object-fit:cover;flex-shrink:0" onerror="this.onerror=null;this.src='https://loremflickr.com/400/400/product?lock=' + Math.floor(Math.random()*1000)" alt=""><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.8rem;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.title||'—'}</div><div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap"><span style="font-size:.7rem;color:var(--text3)">Bizim: <strong style="color:var(--text)">₺${c.ourPrice.toLocaleString()}</strong></span><span style="font-size:.7rem;color:var(--text3)">Rakip: <strong style="color:var(--text)">₺${c.compPrice.toLocaleString()}</strong></span><span class="pcd ${st}" style="font-size:.72rem;font-weight:700">${diff<0?'⬇️':'⬆️'} ${Math.abs(dp)}% (₺${Math.abs(diff).toLocaleString()})</span></div><div style="font-size:.6rem;color:var(--text3)">Son: ${new Date(c.lastChecked).toLocaleString('tr-TR')}</div></div><div style="display:flex;gap:3px;flex-shrink:0"><button class="btn btn-gh xs" onclick="checkAllComp()">🔄</button><button class="btn btn-r xs" onclick="removeComp('${c.id}')">✕</button></div></div>`;}).join('');
 }
 
 // ════════════════════════════════════════════════════════
@@ -1203,7 +1203,7 @@ function openLedger(id){
   const moP=vel.monthly*(ai.netProfit||0);
   document.getElementById("ledger-cnt").innerHTML=`
     <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
-      <img src="${p.img||''}" style="width:56px;height:56px;border-radius:9px;object-fit:cover" onerror="this.src=''" alt="">
+      <img src="${p.img||''}" style="width:56px;height:56px;border-radius:9px;object-fit:cover" onerror="this.onerror=null;this.src='https://loremflickr.com/400/400/product?lock=' + Math.floor(Math.random()*1000)" alt="">
       <div><div style="font-weight:800;font-size:.92rem">${p.title||'—'}</div><div style="font-size:.7rem;color:var(--text2)">${p.cat} · GTİP: ${p.gtip||'—'}</div></div>
     </div>
     <div class="fg fg2" style="gap:7px;margin-bottom:14px">
