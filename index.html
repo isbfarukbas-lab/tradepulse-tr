@@ -1615,6 +1615,67 @@ setInterval(()=>{
 setInterval(()=>{const n=new Date();if(n.getHours()===9&&n.getMinutes()===0&&n.getSeconds()<3)sendMail();},1000);
 
 // ════════════════════════════════════════════════════════
+// EXTENSION POLLER
+// ════════════════════════════════════════════════════════
+async function pollExtensionData() {
+  try {
+    const res = await fetch('/api/extension-pull');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.ok && data.product) {
+      // Eklentiden gelen ürünü formatla
+      const p = data.product;
+      const f = parseFloat(p.price) || 0;
+      
+      // USD'ye çevir (Alibaba ise zaten USD'dir, Trendyol ise TL'yi böl)
+      const fob = p.source === 'trendyol' ? parseFloat((f / USD_RATE).toFixed(2)) : f;
+      const tr = p.source === 'trendyol' ? f : Math.round(f * USD_RATE * 1.5);
+      
+      const item = {
+        id: p.id || `ext_${Date.now()}`,
+        title: p.title,
+        cat: '📱 Elektronik', // Default fallback
+        fob: fob || 5,
+        tr: tr || 500,
+        gtip: '8543.70.90.00',
+        img: p.img,
+        q: p.title.substring(0, 20)
+      };
+      
+      // AI Score
+      const ai = calcAI(item);
+      if (!ai) return;
+      const vel = velScore(item), trd = trendSig(item), fxRisk = fxRiskCalc(item), sup = supScore(item);
+      
+      const finalItem = {
+        ...item, ...ai,
+        velScore: vel.score, velLabel: vel.label, velMo: vel.monthly,
+        trendScore: trd.score, trendLabel: trd.label, trendChange: trd.change,
+        fxRisk: fxRisk.risk, fxLabel: fxRisk.label, fxPct: fxRisk.pct,
+        supLabel: sup.label, scannedAt: new Date().toISOString(),
+        isExtension: true
+      };
+      
+      archiveList.unshift(finalItem);
+      archiveSet.add(finalItem.id);
+      addLiveRow(finalItem);
+      
+      // Bildirim
+      const ti=document.getElementById("ticker-main");
+      if(ti)ti.innerHTML=`<span style="color:#2563eb">🚀 [EKLENTİDEN GELDİ]</span> ${p.title.substring(0,40)}... Kâr: ₺${(finalItem.netProfit||0).toLocaleString()}`;
+      
+      updateDashMetrics();
+      renderTop10();
+      saveState();
+      
+      alert('🧩 Eklentiden Yeni Ürün Geldi:\n' + p.title);
+    }
+  } catch (e) {}
+}
+
+setInterval(pollExtensionData, 3000);
+
+// ════════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════════
 async function initApp(){
