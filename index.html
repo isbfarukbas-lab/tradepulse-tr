@@ -898,7 +898,14 @@ function addLiveRow(p){
     <td><span class="b ${vb}" style="font-size:.6rem">${p.velLabel||'—'} (${p.velMo||0}/ay)</span></td>
     <td><span class="b ${fb}" style="font-size:.6rem">${p.fxLabel||'—'}</span></td>
     <td><div style="font-weight:800;color:${sc2};font-size:.8rem">${sc}/100</div><div class="sb2"><div class="sf ${sc>=85?'vhi':sc>=70?'hi':''}" style="width:${sc}%"></div></div></td>
-    <td><div style="display:flex;gap:3px"><button class="btn btn-p xs" onclick="openLedger('${p.id}')">📊</button><button class="btn btn-g xs" onclick="addToStock('${p.id}')">📦</button><button class="btn btn-a xs" onclick="addToComp('${p.id}')">🎯</button><button class="btn btn-c xs" onclick="openRfq('${(p.title||'').replace(/'/g,"\\'")}',${p.fob||0},'${p.q||''}')">📄</button></div></td>`;
+    <td><div style="display:flex;gap:3px;flex-wrap:wrap">
+      <button class="btn btn-p xs" onclick="openLedger('${p.id}')">📊</button>
+      <button class="btn btn-g xs" onclick="addToStock('${p.id}')">📦</button>
+      <button class="btn btn-a xs" onclick="addToComp('${p.id}')">🎯</button>
+      <button class="btn btn-c xs" onclick="openRfq('${(p.title||'').replace(/'/g,"\\'")}',${p.fob||0},'${p.q||''}')">📄</button>
+      <a href="${p.url || 'https://www.alibaba.com/trade/search?SearchText=' + encodeURIComponent(p.title)}" target="_blank" class="btn btn-gh xs" style="text-decoration:none;padding:3px 6px">🔗 Ürün</a>
+      <a href="${p.sellerUrl || 'https://www.alibaba.com/trade/search?SearchText=' + encodeURIComponent(p.title) + '&IndexArea=company_en'}" target="_blank" class="btn btn-gh xs" style="text-decoration:none;padding:3px 6px">🏭 Satıcı</a>
+    </div></td>`;
   tb.insertBefore(tr,tb.firstChild);
   if(tb.children.length>60)tb.removeChild(tb.lastChild);
 }
@@ -950,8 +957,8 @@ function renderArchive(){
         <button class="btn btn-g xs" onclick="addToStock('${p.id}')">📦</button>
         <button class="btn btn-a xs" onclick="addToComp('${p.id}')">🎯</button>
         <button class="btn btn-c xs" onclick="openRfq('${(p.title||'').replace(/'/g,"\\'")}',${p.fob||0},'${p.q||''}')">📄</button>
-        ${p.url ? `<a href="${p.url}" target="_blank" class="btn btn-gh xs" style="text-decoration:none;padding:3px 6px">🔗 Ürün</a>` : ''}
-        ${p.sellerUrl ? `<a href="${p.sellerUrl}" target="_blank" class="btn btn-gh xs" style="text-decoration:none;padding:3px 6px">🏭 Satıcı</a>` : ''}
+        <a href="${p.url || 'https://www.alibaba.com/trade/search?SearchText=' + encodeURIComponent(p.title)}" target="_blank" class="btn btn-gh xs" style="text-decoration:none;padding:3px 6px">🔗 Ürün</a>
+        <a href="${p.sellerUrl || 'https://www.alibaba.com/trade/search?SearchText=' + encodeURIComponent(p.title) + '&IndexArea=company_en'}" target="_blank" class="btn btn-gh xs" style="text-decoration:none;padding:3px 6px">🏭 Satıcı</a>
       </div></td>`;
     tb.appendChild(tr);
   });
