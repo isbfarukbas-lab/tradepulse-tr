@@ -1228,19 +1228,22 @@ function recalculateLedger() {
   const simFob = parseFloat(document.getElementById("calc-fob-input").value) || 0;
   const simTr = parseFloat(document.getElementById("calc-tr-input").value) || 0;
 
+  // Run calcAI with simulated pricing
   const tempItem = { ...p, fob: simFob, tr: simTr };
   const ai = calcAI(tempItem);
+
+  const tax = CATEGORY_TAXES[p.cat] || { gv: 30, igv: 20, otv: 0, trt: 0, kdv: 20, fixed: 40 };
 
   const fobTry = simFob * USD_RATE;
   const estFreight = fobTry * 0.08; 
   const cifValue = fobTry + estFreight;
-  const gv = cifValue * (FINANCIAL_SETTINGS.gvRate / 100);
-  const igv = cifValue * (FINANCIAL_SETTINGS.igvRate / 100);
-  const trt = cifValue * (FINANCIAL_SETTINGS.trtRate / 100);
+  const gv = cifValue * (tax.gv / 100);
+  const igv = cifValue * (tax.igv / 100);
+  const trt = cifValue * (tax.trt / 100);
   const otvBase = cifValue + gv + igv + trt;
-  const otv = otvBase * (FINANCIAL_SETTINGS.otvRate / 100);
+  const otv = otvBase * (tax.otv / 100);
   const kdvBase = otvBase + otv;
-  const kdv = kdvBase * (FINANCIAL_SETTINGS.kdvRate / 100);
+  const kdv = kdvBase * (tax.kdv / 100);
 
   const importHtml = `
     <div style="display:flex;justify-content:space-between">
@@ -1252,28 +1255,28 @@ function recalculateLedger() {
       <strong>₺${estFreight.toFixed(2)} (Desi: ${p.fbaW || '0.8 desi'})</strong>
     </div>
     <div style="display:flex;justify-content:space-between">
-      <span style="color:#94a3b8">Gümrük Vergisi (%${FINANCIAL_SETTINGS.gvRate}):</span>
+      <span style="color:#94a3b8">Gümrük Vergisi (%${tax.gv}):</span>
       <strong style="color:#fb923c">₺${gv.toFixed(2)}</strong>
     </div>
     <div style="display:flex;justify-content:space-between">
-      <span style="color:#94a3b8">İlave Gümrük Vergisi - İGV (%${FINANCIAL_SETTINGS.igvRate}):</span>
+      <span style="color:#94a3b8">İlave Gümrük Vergisi - İGV (%${tax.igv}):</span>
       <strong style="color:#fb923c">₺${igv.toFixed(2)}</strong>
     </div>
     <div style="display:flex;justify-content:space-between">
-      <span style="color:#94a3b8">TRT Bandrolü (%${FINANCIAL_SETTINGS.trtRate}):</span>
+      <span style="color:#94a3b8">TRT Bandrolü (%${tax.trt}):</span>
       <strong style="color:#fb923c">₺${trt.toFixed(2)}</strong>
     </div>
     <div style="display:flex;justify-content:space-between">
-      <span style="color:#94a3b8">Özel Tüketim Vergisi - ÖTV (%${FINANCIAL_SETTINGS.otvRate}):</span>
+      <span style="color:#94a3b8">Özel Tüketim Vergisi - ÖTV (%${tax.otv}):</span>
       <strong style="color:#fb923c">₺${otv.toFixed(2)}</strong>
     </div>
     <div style="display:flex;justify-content:space-between">
-      <span style="color:#94a3b8">İthalat KDV (%${FINANCIAL_SETTINGS.kdvRate}):</span>
+      <span style="color:#94a3b8">İthalat KDV (%${tax.kdv}):</span>
       <strong style="color:#fb923c">₺${kdv.toFixed(2)}</strong>
     </div>
     <div style="display:flex;justify-content:space-between">
       <span style="color:#94a3b8">Müşavirlik & Antrepo Payı:</span>
-      <strong>₺${FINANCIAL_SETTINGS.fixedClearance.toFixed(2)}</strong>
+      <strong>₺${tax.fixed.toFixed(2)}</strong>
     </div>
     <div style="border-top:1px dashed #1e293b;padding-top:6px;display:flex;justify-content:space-between;font-weight:700">
       <span style="color:#f1f5f9">Toplam Landed Maliyet (Gümrük Kapı Teslim):</span>
