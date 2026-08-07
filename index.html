@@ -945,7 +945,14 @@ function renderArchive(){
       <td><span class="b ${fb}" style="font-size:.6rem">${p.fxLabel||'—'}</span></td>
       <td><span class="b ${p.supLabel&&p.supLabel.includes('Diamond')?'bp':p.supLabel&&p.supLabel.includes('Gold')?'ba':'bac'}" style="font-size:.6rem">${p.supLabel||'—'}</span></td>
       <td><div style="font-weight:800;color:${sc2}">${sc}</div><div class="sb2"><div class="sf ${sc>=85?'vhi':sc>=70?'hi':''}" style="width:${sc}%"></div></div></td>
-      <td><div style="display:flex;gap:3px;flex-wrap:wrap"><button class="btn btn-p xs" onclick="openLedger('${p.id}')">📊</button><button class="btn btn-g xs" onclick="addToStock('${p.id}')">📦</button><button class="btn btn-a xs" onclick="addToComp('${p.id}')">🎯</button><button class="btn btn-c xs" onclick="openRfq('${(p.title||'').replace(/'/g,"\\'")}',${p.fob||0},'${p.q||''}')">📄</button></div></td>`;
+      <td><div style="display:flex;gap:3px;flex-wrap:wrap">
+        <button class="btn btn-p xs" onclick="openLedger('${p.id}')">📊</button>
+        <button class="btn btn-g xs" onclick="addToStock('${p.id}')">📦</button>
+        <button class="btn btn-a xs" onclick="addToComp('${p.id}')">🎯</button>
+        <button class="btn btn-c xs" onclick="openRfq('${(p.title||'').replace(/'/g,"\\'")}',${p.fob||0},'${p.q||''}')">📄</button>
+        ${p.url ? `<a href="${p.url}" target="_blank" class="btn btn-gh xs" style="text-decoration:none;padding:3px 6px">🔗 Ürün</a>` : ''}
+        ${p.sellerUrl ? `<a href="${p.sellerUrl}" target="_blank" class="btn btn-gh xs" style="text-decoration:none;padding:3px 6px">🏭 Satıcı</a>` : ''}
+      </div></td>`;
     tb.appendChild(tr);
   });
   // Listing select update
@@ -1639,6 +1646,9 @@ async function pollExtensionData() {
         tr: tr || 500,
         gtip: '8543.70.90.00',
         img: p.img,
+        url: p.url,
+        sellerName: p.sellerName,
+        sellerUrl: p.sellerUrl,
         q: p.title.substring(0, 20)
       };
       
