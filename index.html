@@ -652,7 +652,7 @@ select.inp option{background:var(--surface)}
 <!-- ══ MODALS ══ -->
 <div id="m-ledger" class="mbg"><div class="modal"><button class="mc" onclick="closeModal('ledger')">✕</button><div class="mtit">📊 Finansal Hesap Dökümü</div><div id="ledger-cnt"></div></div></div>
 <div id="m-rfq" class="mbg"><div class="modal"><button class="mc" onclick="closeModal('rfq')">✕</button><div class="mtit">📄 Tedarikçiye RFQ Gönder</div><div class="fr"><label class="il">Alibaba Arama Linki</label><a id="rfq-link" href="#" target="_blank" style="color:var(--cyan);font-size:.8rem">🔗 Alibaba'da Ara ↗</a></div><div class="fr" style="margin-top:10px"><label class="il">Hazır RFQ Metni</label><textarea class="inp" id="rfq-area" rows="12" style="resize:vertical;line-height:1.6"></textarea></div><button class="btn btn-p sm" style="margin-top:8px" onclick="copyRfq()">📋 Kopyala</button></div></div>
-
+<div id="m-cust" class="mbg"><div class="modal"><button class="mc" onclick="closeModal('cust')">✕</button><div class="mtit">⚖️ İthalat & Gümrük Raporu</div><div id="cust-mod-cnt"></div></div></div>
 <script>
 // ════════════════════════════════════════════════════════
 // CONFIG & STATE
@@ -886,7 +886,7 @@ function addLiveRow(p){
   const mb2=mg>=50?'bg':mg>=30?'ba':'br';
   const sc2=sc>=85?'#34d399':sc>=70?'#fbbf24':'#94a3b8';
   const tr=document.createElement('tr');tr.className='nr';
-  tr.innerHTML=`<td><div style="display:flex;align-items:center;gap:7px"><img src="${p.img||''}" class="th" onerror="this.src=''" alt=""><div style="max-width:165px"><div style="font-weight:700;font-size:.73rem;line-height:1.3">${p.title||'—'}</div><div style="font-size:.6rem;color:var(--text3)">${p.gtip||''}</div></div></div></td>
+  tr.innerHTML=`<td><div style="display:flex;align-items:center;gap:7px"><img src="${p.img||''}" class="th" onerror="this.src=''" alt=""><div style="max-width:165px"><div style="font-weight:700;font-size:.73rem;line-height:1.3;margin-bottom:3px">${p.title||'—'}</div><button class="btn btn-gh xs" style="padding:2px 6px;font-size:.6rem" onclick="openCustMod('${p.id}')">⚖️ GTİP: ${p.gtip||'Belirsiz'}</button></div></div></td>
     <td><span class="b bac" style="font-size:.58rem">${p.cat||'—'}</span></td>
     <td style="font-weight:700;color:#38bdf8">$${(p.fob||0).toFixed(2)}</td>
     <td style="font-weight:700">₺${(p.tr||0).toLocaleString()}</td>
@@ -932,7 +932,7 @@ function renderArchive(){
     const sc2=sc>=85?'#34d399':sc>=70?'#fbbf24':'#94a3b8';
     const tr=document.createElement('tr');
     tr.innerHTML=`<td style="color:var(--text3);font-weight:700">${i+1}</td>
-      <td><div style="display:flex;align-items:center;gap:7px"><img src="${p.img||''}" class="th" onerror="this.src=''" alt=""><div style="max-width:150px"><div style="font-weight:700;font-size:.72rem;line-height:1.3">${p.title||'—'}</div><div style="font-size:.58rem;color:var(--text3)">${p.gtip||''}</div></div></div></td>
+      <td><div style="display:flex;align-items:center;gap:7px"><img src="${p.img||''}" class="th" onerror="this.src=''" alt=""><div style="max-width:150px"><div style="font-weight:700;font-size:.72rem;line-height:1.3;margin-bottom:3px">${p.title||'—'}</div><button class="btn btn-gh xs" style="padding:2px 6px;font-size:.6rem" onclick="openCustMod('${p.id}')">⚖️ GTİP: ${p.gtip||'Belirsiz'}</button></div></div></td>
       <td><span class="b bac" style="font-size:.57rem">${p.cat||'—'}</span></td>
       <td style="color:#38bdf8;font-weight:700">$${(p.fob||0).toFixed(2)}</td>
       <td style="font-weight:700">₺${(p.tr||0).toLocaleString()}</td>
@@ -1275,6 +1275,48 @@ TradePulse TR — Procurement Team`;
 }
 
 function copyRfq(){navigator.clipboard.writeText(document.getElementById("rfq-area").value).then(()=>alert('✅ Panoya kopyalandı!')).catch(()=>{});}
+
+// ════════════════════════════════════════════════════════
+// CUSTOMS MODAL
+// ════════════════════════════════════════════════════════
+function openCustMod(id){
+  const p=archiveList.find(x=>x.id===id);if(!p)return;
+  const tax = p.tax || CAT_TAX[p.cat] || {gv:20,igv:10,kdv:20,otv:0};
+  
+  let reqs = "Genel ürün kurallarına tabidir.";
+  let riskLabel = "🟢 Düşük Risk";
+  
+  if (p.cat.includes('Güzellik') || p.cat.includes('Kozmetik')) { reqs = "ÜTS kaydı ve Sağlık Bakanlığı serbest satış sertifikası gerektirir."; riskLabel = "🔴 Yüksek Risk"; }
+  if (p.cat.includes('Çocuk') || p.cat.includes('Bebek')) { reqs = "CE belgesi ve EN71 Test Raporu TAREKS denetiminde istenir."; riskLabel = "🔴 Yüksek Risk"; }
+  if (p.cat.includes('Elektronik')) { reqs = "CE Belgesi zorunludur. Bataryalı ise MSDS test raporu gereklidir."; riskLabel = "🟡 Orta Risk"; }
+  
+  const cnt=document.getElementById("cust-mod-cnt");
+  if(cnt)cnt.innerHTML=`
+    <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px">
+      <img src="${p.img||''}" style="width:40px;height:40px;border-radius:6px;object-fit:cover">
+      <div>
+        <div style="font-weight:700;font-size:.85rem">${p.title}</div>
+        <div style="font-size:.75rem;color:var(--cyan);margin-top:2px">${p.cat}</div>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:15px">
+      <div class="mb"><div class="mbl">GTİP Kodu</div><div class="mbv" style="color:var(--text);font-size:1.1rem">${p.gtip||'—'}</div></div>
+      <div class="mb"><div class="mbl">İthalat Zorluğu</div><div class="mbv" style="font-size:1.1rem">${riskLabel}</div></div>
+    </div>
+    <div class="mb" style="margin-bottom:15px"><div class="mbl">Vergi Dağılımı (Özet)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+        <span class="b bg">KDV: %${tax.kdv}</span>
+        <span class="b ${tax.gv>10?'ba':'bg'}">Gümrük: %${tax.gv}</span>
+        <span class="b ${tax.igv>0?'br':'bg'}">İGV: %${tax.igv}</span>
+        ${tax.otv>0?`<span class="b br">ÖTV: %${tax.otv}</span>`:''}
+      </div>
+    </div>
+    <div style="padding:12px;background:rgba(255,255,255,.03);border-radius:var(--r);font-size:.8rem;border-left:3px solid var(--cyan)">
+      <strong>📋 Gümrük Uyarıları:</strong><br>${reqs}
+    </div>
+  `;
+  openModal('cust');
+}
 
 // ════════════════════════════════════════════════════════
 // SETTINGS
