@@ -265,7 +265,9 @@ app.get('/api/live-check', async (req, res) => {
   });
 });
 
-// POST /api/extension-push  — Chrome Eklentisi Webhook (Mock)
+// POST /api/extension-push  — Chrome Eklentisi Webhook
+let extensionQueue = [];
+
 app.post('/api/extension-push', (req, res) => {
   try {
     const { product, token } = req.body;
@@ -273,9 +275,20 @@ app.post('/api/extension-push', (req, res) => {
       return res.status(401).json({ error: 'Geçersiz Eklenti Anahtarı' });
     }
     console.log(`[EXTENSION] Yeni ürün geldi: ${product?.title}`);
+    extensionQueue.push(product);
     res.json({ ok: true, message: 'Ürün TradePulse YZ motoruna başarıyla aktarıldı' });
   } catch (e) {
     res.status(500).json({ error: e.message });
+  }
+});
+
+// GET /api/extension-pull — Frontend'in ürünleri çekmesi için
+app.get('/api/extension-pull', (req, res) => {
+  if (extensionQueue.length > 0) {
+    const product = extensionQueue.shift();
+    res.json({ ok: true, product });
+  } else {
+    res.json({ ok: false });
   }
 });
 
