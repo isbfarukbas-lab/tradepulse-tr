@@ -814,10 +814,19 @@ function sortArch(field,btn){
   renderArchive();
 }
 
+let _t10Ids = '';
 function renderTop10(){
   const grid=document.getElementById("top10-grid");if(!grid)return;
+  const pTop=document.getElementById("p-top10");
+  if(pTop && !pTop.classList.contains("on") && grid.innerHTML!=='') return; // Sadece aktifse veya ilk yüklemeyse çiz
+  
   const top=[...archiveList].sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,10);
   if(!top.length){grid.innerHTML='<div class="empty"><div class="ei">🏆</div><p>Tarama başlayınca Top 10 burada görünür</p></div>';return;}
+  
+  const cids = top.map(p=>p.id).join(',');
+  if(cids === _t10Ids && grid.innerHTML!=='') return;
+  _t10Ids = cids;
+  
   const st=document.getElementById("top10-stats");
   if(st){const am=Math.round(top.reduce((a,p)=>a+(p.margin||0),0)/top.length);const tp=top.reduce((a,p)=>a+(p.netProfit||0),0);st.innerHTML=`<div class="sp spg">Ort. Marj: %${am}</div><div class="sp spb">Toplam Potansiyel: ₺${tp.toLocaleString()}</div><div class="sp spac">${top.length} ürün listelendi</div>`;}
   const med=['🥇','🥈','🥉'];
@@ -856,7 +865,20 @@ function updateDashMetrics(){
   document.getElementById("d-wl").textContent=compList.length;
   // Recent
   const rl=document.getElementById("recent-list");
-  if(rl){const rc=archiveList.slice(0,6);rl.innerHTML=rc.map(p=>`<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)"><img src="${p.img||''}" style="width:36px;height:36px;border-radius:7px;object-fit:cover;flex-shrink:0" onerror="this.src=''" alt=""><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title||'—'}</div><div style="font-size:.65rem;color:var(--text2)">${p.cat} · ₺${(p.netProfit||0).toLocaleString()} kâr · ${p.trendLabel||''}</div></div><div style="font-weight:800;color:${(p.score||0)>=85?'#34d399':(p.score||0)>=70?'#fbbf24':'#94a3b8'};font-size:.88rem;flex-shrink:0">${p.score||0}</div></div>`).join('');}
+  const pDash=document.getElementById("p-dashboard");
+  if(rl && pDash && pDash.classList.contains("on")){
+    const p = archiveList[0];
+    if(p && rl.dataset.lastId !== p.id){
+      if(!rl.children.length){
+        const rc=archiveList.slice(0,6);
+        rl.innerHTML=rc.map(x=>`<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)"><img src="${x.img||''}" style="width:36px;height:36px;border-radius:7px;object-fit:cover;flex-shrink:0" onerror="this.src=''" alt=""><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${x.title||'—'}</div><div style="font-size:.65rem;color:var(--text2)">${x.cat} · ₺${(x.netProfit||0).toLocaleString()} kâr · ${x.trendLabel||''}</div></div><div style="font-weight:800;color:${(x.score||0)>=85?'#34d399':(x.score||0)>=70?'#fbbf24':'#94a3b8'};font-size:.88rem;flex-shrink:0">${x.score||0}</div></div>`).join('');
+      } else {
+        rl.insertAdjacentHTML('afterbegin', `<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)"><img src="${p.img||''}" style="width:36px;height:36px;border-radius:7px;object-fit:cover;flex-shrink:0" onerror="this.src=''" alt=""><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:.77rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.title||'—'}</div><div style="font-size:.65rem;color:var(--text2)">${p.cat} · ₺${(p.netProfit||0).toLocaleString()} kâr · ${p.trendLabel||''}</div></div><div style="font-weight:800;color:${(p.score||0)>=85?'#34d399':(p.score||0)>=70?'#fbbf24':'#94a3b8'};font-size:.88rem;flex-shrink:0">${p.score||0}</div></div>`);
+        if(rl.children.length>6) rl.removeChild(rl.lastChild);
+      }
+      rl.dataset.lastId = p.id;
+    }
+  }
   // FX alert
   const fxAlert=document.getElementById("fx-alert-box");
   const fxTxt=document.getElementById("fx-alert-txt");
