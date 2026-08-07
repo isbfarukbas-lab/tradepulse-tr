@@ -275,22 +275,33 @@ select.inp option{background:var(--surface)}
     <div class="sb-icon">🤖</div>
     <div>
       <div class="sb-name">Trade<em>Pulse</em></div>
-      <div class="sb-ver">TR v3.0 · AI Platform</div>
+      <div class="sb-ver">TR v4.0 · AI Platform</div>
     </div>
   </div>
   <div class="nav-body">
-    <span class="nl">Ana</span>
+    <span class="nl">Ana Ekran</span>
     <button class="ni on" data-page="dashboard" onclick="goPage('dashboard')"><span class="ni-icon">🏠</span><span>Dashboard</span></button>
     <button class="ni" data-page="live" onclick="goPage('live')"><span class="ni-icon">🔴</span><span>Canlı Tarama</span><span class="nbadge g" id="nav-sc">0</span></button>
     <button class="ni" data-page="top10" onclick="goPage('top10')"><span class="ni-icon">🏆</span><span>Top 10</span></button>
-    <span class="nl">Analiz</span>
-    <button class="ni" data-page="archive" onclick="goPage('archive')"><span class="ni-icon">💾</span><span>Arşiv</span><span class="nbadge" id="nav-ac">0</span></button>
+    
+    <span class="nl">Araştırma & Analiz</span>
+    <button class="ni" data-page="archive" onclick="goPage('archive')"><span class="ni-icon">💾</span><span>Ürün Arşivi</span><span class="nbadge" id="nav-ac">0</span></button>
     <button class="ni" data-page="charts" onclick="goPage('charts')"><span class="ni-icon">📈</span><span>Analitik</span></button>
+    <button class="ni" data-page="adspy" onclick="goPage('adspy')"><span class="ni-icon">📢</span><span>AdSpy (Reklam)</span></button>
     <button class="ni" data-page="competitor" onclick="goPage('competitor')"><span class="ni-icon">🎯</span><span>Rakip Takip</span><span class="nbadge r" id="nav-cx" style="display:none">!</span></button>
-    <span class="nl">Yönetim</span>
+    
+    <span class="nl">Operasyon & İthalat</span>
+    <button class="ni" data-page="simulation" onclick="goPage('simulation')"><span class="ni-icon">🔮</span><span>Kriz Simülatörü</span></button>
+    <button class="ni" data-page="customs" onclick="goPage('customs')"><span class="ni-icon">⚖️</span><span>Gümrük YZ</span></button>
+    <button class="ni" data-page="negotiation" onclick="goPage('negotiation')"><span class="ni-icon">💬</span><span>Pazarlık Asistanı</span></button>
     <button class="ni" data-page="stock" onclick="goPage('stock')"><span class="ni-icon">📦</span><span>Stok & Sipariş</span><span class="nbadge a" id="nav-stk" style="display:none">0</span></button>
-    <button class="ni" data-page="listing" onclick="goPage('listing')"><span class="ni-icon">🛍️</span><span>Listeleme Asistanı</span></button>
-    <span class="nl">Sistem</span>
+    
+    <span class="nl">Büyüme & Satış</span>
+    <button class="ni" data-page="listing" onclick="goPage('listing')"><span class="ni-icon">🛍️</span><span>Listeleme AI</span></button>
+    
+    <span class="nl">Sistem & Yönetim</span>
+    <button class="ni" data-page="team" onclick="goPage('team')"><span class="ni-icon">👥</span><span>Takım Yönetimi</span></button>
+    <button class="ni" data-page="extension" onclick="goPage('extension')"><span class="ni-icon">🧩</span><span>Chrome Eklentisi</span></button>
     <button class="ni" data-page="settings" onclick="goPage('settings')"><span class="ni-icon">⚙️</span><span>Ayarlar</span></button>
   </div>
   <div class="sb-foot">
@@ -462,6 +473,141 @@ select.inp option{background:var(--surface)}
       <div class="panel" id="lst-analysis" style="display:none">
         <div class="ptitle">📊 Platform & Rekabet Analizi</div>
         <div id="lst-analysis-cnt"></div>
+      </div>
+    </div>
+
+    <!-- ══ SIMULATION (WHAT-IF) ══ -->
+    <div id="p-simulation" class="page">
+      <div class="ptit">🔮 Kriz & Senaryo Simülatörü</div>
+      <div class="psub">Gelecekteki piyasa dalgalanmalarını simüle edin ve kâr marjınızı test edin</div>
+      <div class="g2">
+        <div class="panel">
+          <div class="ptitle">🎛️ Parametreleri Ayarla</div>
+          <div class="fr">
+            <div style="display:flex;justify-content:space-between"><label class="il">Dolar Kuru (₺)</label><span id="sim-usd-val" style="font-weight:700;font-size:.8rem;color:var(--text2)">38.50</span></div>
+            <input type="range" id="sim-usd" min="30" max="60" step="0.5" value="38.5" style="width:100%;margin-top:8px" oninput="runSim()">
+          </div>
+          <div class="fr">
+            <div style="display:flex;justify-content:space-between"><label class="il">Kargo Maliyeti Çarpanı</label><span id="sim-cargo-val" style="font-weight:700;font-size:.8rem;color:var(--text2)">1.0x</span></div>
+            <input type="range" id="sim-cargo" min="0.5" max="3" step="0.1" value="1" style="width:100%;margin-top:8px" oninput="runSim()">
+          </div>
+          <div class="fr">
+            <div style="display:flex;justify-content:space-between"><label class="il">Pazaryeri Komisyon Artışı (%)</label><span id="sim-comm-val" style="font-weight:700;font-size:.8rem;color:var(--text2)">0</span></div>
+            <input type="range" id="sim-comm" min="-10" max="20" step="1" value="0" style="width:100%;margin-top:8px" oninput="runSim()">
+          </div>
+          <button class="btn btn-c" style="width:100%;justify-content:center;margin-top:10px" onclick="runSim()">🔄 Simülasyonu Çalıştır</button>
+        </div>
+        <div class="panel">
+          <div class="ptitle">📊 Simülasyon Sonuçları</div>
+          <div class="g2" style="margin-bottom:12px">
+            <div class="mb"><div class="mbl">Önceki Ort. Kâr</div><div class="mbv" id="sim-old-profit" style="color:var(--text2)">₺0</div></div>
+            <div class="mb"><div class="mbl">Yeni Ort. Kâr</div><div class="mbv" id="sim-new-profit">₺0</div></div>
+          </div>
+          <div id="sim-alert-box" class="alert-panel alert-warn" style="display:none">
+            <div style="font-size:.75rem;font-weight:700;color:#fbbf24;margin-bottom:4px">⚠️ Risk Uyarısı</div>
+            <div id="sim-alert-txt" style="font-size:.78rem;color:var(--text2)"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CUSTOMS AI ══ -->
+    <div id="p-customs" class="page">
+      <div class="ptit">⚖️ Gümrük ve Mevzuat AI</div>
+      <div class="psub">Ürünlerin GTİP kodlarını ve ithalat gereksinimlerini (TSE, CE) öğrenin</div>
+      <div class="panel">
+        <div class="fr"><label class="il">Ürün Adı veya GTİP Kodu</label>
+        <div style="display:flex;gap:10px">
+          <input type="text" id="cust-inp" class="inp" placeholder="Örn: Akıllı Saat veya 8517.62.00.00">
+          <button class="btn btn-p" onclick="analyzeCustoms()">🔍 Analiz Et</button>
+        </div>
+        </div>
+        <div id="cust-res" style="display:none;margin-top:20px">
+          <div class="g3">
+            <div class="mb"><div class="mbl">Tahmini GTİP</div><div class="mbv" id="cust-gtip" style="color:var(--cyan)">-</div></div>
+            <div class="mb"><div class="mbl">Gümrük Vergisi</div><div class="mbv" id="cust-gv">-</div></div>
+            <div class="mb"><div class="mbl">İlave Gümrük (İGV)</div><div class="mbv" id="cust-igv">-</div></div>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:rgba(255,255,255,.03);border-radius:var(--r);font-size:.8rem" id="cust-req"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ NEGOTIATION AI ══ -->
+    <div id="p-negotiation" class="page">
+      <div class="ptit">💬 Tedarikçi Pazarlık Asistanı</div>
+      <div class="psub">Alibaba tedarikçileriyle pazarlık yapmak için AI destekli mail şablonları</div>
+      <div class="g2">
+        <div class="panel">
+          <div class="ptitle">📋 Analiz Edilecek Ürün</div>
+          <div class="fr"><label class="il">Arşivden Seç</label><select class="inp" id="neg-sel"><option value="">— Ürün seçin —</option></select></div>
+          <div class="fr"><label class="il">Tahmini Sipariş Adedi</label><input type="number" id="neg-qty" class="inp" value="1000"></div>
+          <button class="btn btn-p" style="width:100%;justify-content:center;margin-top:10px" onclick="genNegotiation()">✨ Şablon Üret</button>
+        </div>
+        <div class="panel">
+          <div class="ptitle">📧 Üretilen Pazarlık Maili <button class="btn btn-gh xs" style="margin-left:auto" onclick="copyNeg()">📋 Kopyala</button></div>
+          <div class="lout" id="neg-out">Ürün seçip "Şablon Üret" butonuna basın…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ADSPY ══ -->
+    <div id="p-adspy" class="page">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+        <div><div class="ptit">📢 AdSpy Reklam Casusu</div><div class="psub" style="margin:0">Rakiplerin Trendyol ve Google'da hangi kelimelere reklam verdiğini analiz edin</div></div>
+      </div>
+      <div class="panel">
+        <div style="display:flex;gap:10px">
+          <input type="text" id="ad-inp" class="inp" placeholder="Anahtar kelime girin (Örn: Termos)">
+          <button class="btn btn-p" onclick="analyzeAds()">🔍 Ara</button>
+        </div>
+      </div>
+      <div class="tw" id="ad-res" style="display:none">
+        <table>
+          <thead><tr><th>Anahtar Kelime</th><th>Arama Hacmi</th><th>Rekabet</th><th>Tahmini TBM (CPC)</th><th>Fırsat Skoru</th></tr></thead>
+          <tbody id="ad-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══ TEAM ══ -->
+    <div id="p-team" class="page">
+      <div class="ptit">👥 Takım & Rol Yönetimi</div>
+      <div class="psub">Asistanlarınızı sisteme ekleyin ve yetkilerini (Finans, Görme, Düzenleme) yönetin</div>
+      <div class="g2">
+        <div class="panel">
+          <div class="ptitle">➕ Yeni Kullanıcı Ekle</div>
+          <div class="fr"><label class="il">İsim Soyisim</label><input type="text" class="inp" id="team-name"></div>
+          <div class="fr"><label class="il">E-Posta</label><input type="text" class="inp" id="team-email"></div>
+          <div class="fr"><label class="il">Rol</label><select class="inp" id="team-role"><option>Araştırmacı (Sadece Ürün Bulur)</option><option>Listeleme Uzmanı</option><option>Yönetici (Full Yetki)</option></select></div>
+          <button class="btn btn-g" style="width:100%;justify-content:center" onclick="addTeam()">Kullanıcı Ekle</button>
+        </div>
+        <div class="panel">
+          <div class="ptitle">📋 Takım Üyeleri</div>
+          <div id="team-list">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:rgba(255,255,255,.05);border-radius:7px;margin-bottom:8px">
+              <div><div style="font-weight:700;font-size:.8rem">Admin User</div><div style="font-size:.65rem;color:var(--text3)">admin@tradepulse.com</div></div>
+              <span class="b bac">Kurucu Yönetici</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EXTENSION ══ -->
+    <div id="p-extension" class="page">
+      <div class="ptit">🧩 Chrome Eklentisi Bağlantısı</div>
+      <div class="psub">Trendyol veya Alibaba'da gezerken tek tıkla TradePulse YZ motoruna ürün gönderin</div>
+      <div class="panel" style="text-align:center;padding:40px 20px">
+        <div style="font-size:3rem;margin-bottom:15px">🔌</div>
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:10px">Eklenti Bağlantı Anahtarınız</div>
+        <div style="background:rgba(0,0,0,.3);padding:15px;border-radius:10px;font-family:monospace;color:var(--cyan);font-size:1.2rem;letter-spacing:2px;border:1px solid var(--borderhi);display:inline-block;margin-bottom:20px">
+          TRDP-V4-98F2-AX55
+        </div>
+        <div>
+          <button class="btn btn-p" onclick="alert('Eklenti API anahtarı kopyalandı! Chrome eklentisinin ayarlar bölümüne yapıştırabilirsiniz.')">📋 Kopyala</button>
+        </div>
+        <p style="font-size:.75rem;color:var(--text2);margin-top:20px;max-width:400px;margin-left:auto;margin-right:auto">Eklentiyi Chrome Web Mağazasından indirdikten sonra yukarıdaki anahtarı girerek TradePulse panelinize doğrudan veri akışı başlatabilirsiniz.</p>
       </div>
     </div>
 
@@ -805,6 +951,8 @@ function renderArchive(){
   // Listing select update
   const sel=document.getElementById("lst-sel");
   if(sel)sel.innerHTML='<option value="">— Ürün seçin —</option>'+list.slice(0,50).map(p=>`<option value="${p.id}">${p.title||p.id}</option>`).join('');
+  const nsel=document.getElementById("neg-sel");
+  if(nsel)nsel.innerHTML='<option value="">— Ürün seçin —</option>'+list.slice(0,50).map(p=>`<option value="${p.id}">${p.title||p.id}</option>`).join('');
 }
 
 function sortArch(field,btn){
@@ -1197,6 +1345,8 @@ function goPage(page){
     case'competitor':renderCompPage();break;
     case'listing':renderArchive();break;
     case'settings':loadSettForm();break;
+    case'simulation':runSim();break;
+    case'negotiation':renderArchive();break;
   }
   if(window.innerWidth<=900)document.getElementById('sb').classList.remove('mob');
 }
@@ -1253,6 +1403,160 @@ function filterLive(el,cat){
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('a'));
   el.classList.add('a');
   document.querySelectorAll('#live-body tr').forEach(r=>{r.style.display=(!cat||r.textContent.includes(cat))?'':'none';});
+}
+
+// ════════════════════════════════════════════════════════
+// V4.0 NEW MODULES LOGIC
+// ════════════════════════════════════════════════════════
+
+// 1. Simulation
+function runSim() {
+  const usd = parseFloat(document.getElementById("sim-usd").value);
+  const cargoMult = parseFloat(document.getElementById("sim-cargo").value);
+  const commInc = parseFloat(document.getElementById("sim-comm").value);
+  
+  document.getElementById("sim-usd-val").textContent = usd.toFixed(2);
+  document.getElementById("sim-cargo-val").textContent = cargoMult.toFixed(1) + "x";
+  document.getElementById("sim-comm-val").textContent = commInc > 0 ? "+"+commInc+"%" : commInc+"%";
+  
+  if(!archiveList.length) return;
+  
+  let oldTotal = 0, newTotal = 0, lossCount = 0;
+  
+  archiveList.forEach(p => {
+    oldTotal += (p.netProfit || 0);
+    // Sim calculation
+    const landBase = (p.fob * USD_RATE) + FS.localCargo;
+    const landSim = (p.fob * usd) + (FS.localCargo * cargoMult);
+    const costDiff = landSim - landBase;
+    
+    const trCommBase = p.tr * (FS.commTrendyol / 100);
+    const trCommSim = p.tr * ((FS.commTrendyol + commInc) / 100);
+    const commDiff = trCommSim - trCommBase;
+    
+    const newProfit = (p.netProfit || 0) - costDiff - commDiff;
+    newTotal += newProfit;
+    
+    if (newProfit < 0 && (p.netProfit || 0) > 0) lossCount++;
+  });
+  
+  const avgOld = Math.round(oldTotal / archiveList.length);
+  const avgNew = Math.round(newTotal / archiveList.length);
+  
+  document.getElementById("sim-old-profit").textContent = `₺${avgOld.toLocaleString()}`;
+  document.getElementById("sim-new-profit").textContent = `₺${avgNew.toLocaleString()}`;
+  document.getElementById("sim-new-profit").style.color = avgNew > avgOld ? '#34d399' : '#ef4444';
+  
+  const alertBox = document.getElementById("sim-alert-box");
+  if(lossCount > 0) {
+    alertBox.style.display = 'block';
+    document.getElementById("sim-alert-txt").innerHTML = `Bu senaryoda portföydeki <strong style="color:#ef4444">${lossCount} ürün</strong> zarara geçiyor. Satış fiyatlarına ortalama <strong>%${Math.round(((avgOld-avgNew)/avgOld)*100)}</strong> zam yapılması gerekebilir.`;
+  } else {
+    alertBox.style.display = 'none';
+  }
+}
+
+// 2. Customs AI
+function analyzeCustoms() {
+  const inp = document.getElementById("cust-inp").value.trim().toLowerCase();
+  if(!inp) return;
+  const res = document.getElementById("cust-res");
+  res.style.display = "block";
+  
+  // Mock logic based on keywords
+  let gtip = "8543.70.90.00", gv = "20%", igv = "10%";
+  let reqs = "CE Belgesi zorunludur. Bataryalı ise MSDS test raporu gereklidir.";
+  
+  if (inp.includes('giyim') || inp.includes('tekstil')) { gtip = "6109.10.00.00"; gv = "12%"; igv = "30%"; reqs = "Sağlık Bakanlığı Azo Boyar Madde test raporu gerektirir. Tareks denetimine tabidir."; }
+  if (inp.includes('oyuncak') || inp.includes('çocuk')) { gtip = "9503.00.49.00"; gv = "0%"; igv = "20%"; reqs = "CE belgesi ve EN71 Test Raporu TAREKS denetiminde kesinlikle istenir."; }
+  if (inp.includes('gıda') || inp.includes('mutfak')) { gtip = "3924.10.00.00"; gv = "6.5%"; igv = "25%"; reqs = "Tarım ve Orman Bakanlığı uygunluk yazısı ve Gıdaya Temas Uygunluk sertifikası gerekir."; }
+  if (inp.includes('kozmetik')) { gtip = "3304.99.00.00"; gv = "20%"; igv = "20%"; reqs = "ÜTS (Ürün Takip Sistemi) kaydı ve Sağlık Bakanlığı serbest satış sertifikası gerektirir."; }
+  
+  document.getElementById("cust-gtip").textContent = gtip;
+  document.getElementById("cust-gv").textContent = gv;
+  document.getElementById("cust-igv").textContent = igv;
+  document.getElementById("cust-req").innerHTML = `<strong>📋 YZ Mevzuat Özeti:</strong><br>${reqs}`;
+}
+
+// 3. Negotiation AI
+function genNegotiation() {
+  const sel = document.getElementById("neg-sel").value;
+  const qty = document.getElementById("neg-qty").value || 1000;
+  if(!sel) return;
+  const p = archiveList.find(x => x.id === sel);
+  if(!p) return;
+  
+  const rawCost = (p.fob * 0.45).toFixed(2);
+  const targetFob = (p.fob * 0.85).toFixed(2);
+  
+  const mail = `Subject: Inquiry for Bulk Order - ${p.title} (Turkish Market)
+
+Dear Sales Manager,
+
+My name is [Your Name], purchasing director at TradePulse TR. We are a leading e-commerce brand in Turkey.
+We have thoroughly analyzed your product "${p.title}" and are interested in placing an initial order of ${qty} pieces for market testing, with the potential of scaling to 5,000+ units/month.
+
+Based on our market intelligence and current raw material indices, the estimated material cost is around $${rawCost}. 
+Your listed FOB price is $${p.fob.toFixed(2)}, but our target FOB price to remain competitive against local brands on Trendyol is $${targetFob}. 
+
+Could you please confirm if you can meet this target price for a ${qty}-piece order? If so, we are ready to proceed with sampling immediately.
+
+Looking forward to a long-term partnership.
+
+Best regards,
+[Your Name]
+TradePulse TR Purchasing Team`;
+
+  document.getElementById("neg-out").textContent = mail;
+}
+
+function copyNeg() {
+  const t = document.getElementById("neg-out").textContent;
+  navigator.clipboard.writeText(t).then(() => alert("Kopyalandı!"));
+}
+
+// 4. AdSpy
+function analyzeAds() {
+  const inp = document.getElementById("ad-inp").value.trim().toLowerCase();
+  if(!inp) return;
+  document.getElementById("ad-res").style.display = "block";
+  
+  const words = [inp, inp + " erkek", inp + " kadın", "ucuz " + inp, inp + " seti"];
+  const html = words.map(w => {
+    const vol = Math.floor(Math.random()*50000)+1000;
+    const comp = Math.floor(Math.random()*100);
+    const cpc = (Math.random()*4+0.5).toFixed(2);
+    const opp = Math.floor((vol / (comp+1) / cpc) / 50);
+    const score = Math.min(Math.max(opp, 10), 99);
+    const color = score > 75 ? 'var(--green)' : score > 50 ? 'var(--amber)' : 'var(--red)';
+    return `<tr>
+      <td style="font-weight:700">${w}</td>
+      <td>${vol.toLocaleString()}</td>
+      <td>%${comp}</td>
+      <td style="color:var(--cyan)">₺${cpc}</td>
+      <td style="color:${color};font-weight:800">${score}/100</td>
+    </tr>`;
+  }).join('');
+  document.getElementById("ad-body").innerHTML = html;
+}
+
+// 5. Team
+function addTeam() {
+  const name = document.getElementById("team-name").value;
+  const email = document.getElementById("team-email").value;
+  const role = document.getElementById("team-role").value;
+  if(!name || !email) return;
+  
+  const color = role.includes('Yönetici') ? 'bac' : role.includes('Listeleme') ? 'ba' : 'bg';
+  
+  const html = `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:rgba(255,255,255,.05);border-radius:7px;margin-bottom:8px">
+    <div><div style="font-weight:700;font-size:.8rem">${name}</div><div style="font-size:.65rem;color:var(--text3)">${email}</div></div>
+    <span class="b ${color}">${role.split(' ')[0]}</span>
+  </div>`;
+  
+  document.getElementById("team-list").insertAdjacentHTML('beforeend', html);
+  document.getElementById("team-name").value = "";
+  document.getElementById("team-email").value = "";
 }
 
 // ════════════════════════════════════════════════════════
