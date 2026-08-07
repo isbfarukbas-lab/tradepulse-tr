@@ -1013,7 +1013,14 @@ async function scanLoop() {
 function addLiveRow(p) {
   const body = document.getElementById("live-body");
   if (!body) return;
-  const scoreColor = p.score >= 85 ? "#34d399" : p.score >= 70 ? "#fbbf24" : "#f87171";
+  const scoreVal = typeof p.score === 'number' ? p.score : 0;
+  const scoreColor = scoreVal >= 85 ? "#34d399" : scoreVal >= 70 ? "#fbbf24" : "#f87171";
+  const fobVal = (parseFloat(p.fob) || 0).toFixed(2);
+  const trVal = (parseFloat(p.tr) || 0).toLocaleString();
+  const landedVal = (parseFloat(p.landed) || 0).toLocaleString();
+  const profitVal = (parseFloat(p.netProfit) || 0).toLocaleString();
+  const marginVal = typeof p.margin === 'number' ? p.margin : 0;
+
   const row = `<tr class="new-row">
     <td><strong style="color:#64748b">${todayScanCount}</strong></td>
     <td><img src="${p.img}" class="thumb" onerror="this.src='https://via.placeholder.com/46x46/1e293b/64748b?text=IMG'"></td>
@@ -1021,25 +1028,25 @@ function addLiveRow(p) {
       <strong style="color:#f1f5f9;display:block;font-size:.82rem">${p.title}</strong>
       <span class="badge b-purple" style="margin-top:3px">${p.cat}</span>
     </td>
-    <td><span class="badge b-blue">${p.gtip}</span></td>
-    <td><strong>$${p.fob.toFixed(2)}</strong></td>
-    <td><strong style="color:#38bdf8">₺${p.tr.toLocaleString()}</strong></td>
-    <td><span style="color:#fbbf24">₺${p.landed.toLocaleString()}</span></td>
+    <td><span class="badge b-blue">${p.gtip || 'Bilinmiyor'}</span></td>
+    <td><strong>$${fobVal}</strong></td>
+    <td><strong style="color:#38bdf8">₺${trVal}</strong></td>
+    <td><span style="color:#fbbf24">₺${landedVal}</span></td>
     <td>
-      <strong style="color:#34d399;display:block">₺${p.netProfit.toLocaleString()}</strong>
-      <span class="badge b-green">%${p.margin} Marj</span>
+      <strong style="color:#34d399;display:block">₺${profitVal}</strong>
+      <span class="badge b-green">%${marginVal} Marj</span>
     </td>
     <td>
-      <strong style="color:${scoreColor}">${p.score}/100</strong>
-      <div class="score-bar"><div class="score-fill" style="width:${p.score}%;background:${scoreColor}"></div></div>
-      <div style="font-size:.68rem;color:#64748b;margin-top:2px">${p.label}</div>
+      <strong style="color:${scoreColor}">${scoreVal}/100</strong>
+      <div class="score-bar"><div class="score-fill" style="width:${scoreVal}%;background:${scoreColor}"></div></div>
+      <div style="font-size:.68rem;color:#64748b;margin-top:2px">${p.label || 'Belirsiz'}</div>
     </td>
-    <td><span class="badge b-red">🔥 ${p.tikTok}%</span></td>
-    <td><span style="font-size:.75rem">${p.trComp}</span></td>
-    <td><span class="badge b-orange">${p.fbaW}</span></td>
+    <td><span class="badge b-red">🔥 ${p.tikTok || 0}%</span></td>
+    <td><span style="font-size:.75rem">${p.trComp || 'Belirsiz'}</span></td>
+    <td><span class="badge b-orange">${p.fbaW || '—'}</span></td>
     <td style="white-space:nowrap">
       <button class="btn btn-blue btn-sm" onclick="openLedger('${p.id}')">📊 DETAY</button>
-      <button class="btn btn-orange btn-sm" onclick="openRfq('${p.title.replace(/'/g,"\\'")}',${p.fob},'${p.q}')">📄 RFQ</button>
+      <button class="btn btn-orange btn-sm" onclick="openRfq('${p.title.replace(/'/g,"\\'")}',${p.fob || 0},'${p.q}')">📄 RFQ</button>
     </td>
   </tr>`;
   body.insertAdjacentHTML("afterbegin", row);
@@ -1049,17 +1056,23 @@ function addArchiveRow(p) {
   const body = document.getElementById("archive-body");
   document.getElementById("archive-empty").style.display = "none";
   if (!body) return;
+  const scoreVal = typeof p.score === 'number' ? p.score : 0;
+  const fobVal = (parseFloat(p.fob) || 0).toFixed(2);
+  const trVal = (parseFloat(p.tr) || 0).toLocaleString();
+  const profitVal = (parseFloat(p.netProfit) || 0).toLocaleString();
+  const marginVal = typeof p.margin === 'number' ? p.margin : 0;
+
   const row = `<tr>
-    <td style="font-size:.72rem;color:#475569">${p.ts}</td>
+    <td style="font-size:.72rem;color:#475569">${p.ts || '—'}</td>
     <td><img src="${p.img}" class="thumb" onerror="this.src='https://via.placeholder.com/46x46/1e293b/64748b?text=IMG'"></td>
     <td><strong style="font-size:.8rem">${p.title}</strong></td>
     <td><span class="badge b-purple">${p.cat}</span></td>
-    <td>$${p.fob.toFixed(2)}</td>
-    <td style="color:#38bdf8">₺${p.tr.toLocaleString()}</td>
-    <td style="color:#34d399"><strong>₺${p.netProfit.toLocaleString()}</strong></td>
-    <td><span class="badge b-green">%${p.margin}</span></td>
-    <td><strong style="color:${p.score>=85?'#34d399':p.score>=70?'#fbbf24':'#f87171'}">${p.score}/100 ${p.label}</strong></td>
-    <td><span class="badge b-blue">${p.gtip}</span></td>
+    <td>$${fobVal}</td>
+    <td style="color:#38bdf8">₺${trVal}</td>
+    <td style="color:#34d399"><strong>₺${profitVal}</strong></td>
+    <td><span class="badge b-green">%${marginVal}</span></td>
+    <td><strong style="color:${scoreVal>=85?'#34d399':scoreVal>=70?'#fbbf24':'#f87171'}">${scoreVal}/100 ${p.label || ''}</strong></td>
+    <td><span class="badge b-blue">${p.gtip || 'Bilinmiyor'}</span></td>
     <td style="white-space:nowrap">
       <button class="btn btn-blue btn-sm" onclick="openLedger('${p.id}')">📊 DETAY</button>
       <a href="https://www.alibaba.com/trade/search?SearchText=${p.q}" target="_blank" class="btn btn-sm btn-orange" style="text-decoration:none">↗ Alibaba</a>
@@ -1081,17 +1094,23 @@ function renderArchive() {
 }
 
 function addArchiveRowDirect(p, body) {
+  const scoreVal = typeof p.score === 'number' ? p.score : 0;
+  const fobVal = (parseFloat(p.fob) || 0).toFixed(2);
+  const trVal = (parseFloat(p.tr) || 0).toLocaleString();
+  const profitVal = (parseFloat(p.netProfit) || 0).toLocaleString();
+  const marginVal = typeof p.margin === 'number' ? p.margin : 0;
+
   const row = `<tr>
     <td style="font-size:.72rem;color:#475569">${p.ts||'—'}</td>
     <td><img src="${p.img}" class="thumb" onerror="this.src='https://via.placeholder.com/46x46/1e293b/64748b?text=IMG'"></td>
     <td><strong style="font-size:.8rem">${p.title}</strong></td>
     <td><span class="badge b-purple">${p.cat}</span></td>
-    <td>$${p.fob.toFixed(2)}</td>
-    <td style="color:#38bdf8">₺${p.tr.toLocaleString()}</td>
-    <td style="color:#34d399"><strong>₺${(p.netProfit||0).toLocaleString()}</strong></td>
-    <td><span class="badge b-green">%${p.margin||0}</span></td>
-    <td><strong style="color:${(p.score||0)>=85?'#34d399':(p.score||0)>=70?'#fbbf24':'#f87171'}">${p.score||0}/100</strong></td>
-    <td><span class="badge b-blue">${p.gtip}</span></td>
+    <td>$${fobVal}</td>
+    <td style="color:#38bdf8">₺${trVal}</td>
+    <td style="color:#34d399"><strong>₺${profitVal}</strong></td>
+    <td><span class="badge b-green">%${marginVal}</span></td>
+    <td><strong style="color:${scoreVal>=85?'#34d399':scoreVal>=70?'#fbbf24':'#f87171'}">${scoreVal}/100</strong></td>
+    <td><span class="badge b-blue">${p.gtip || 'Bilinmiyor'}</span></td>
     <td style="white-space:nowrap">
       <button class="btn btn-blue btn-sm" onclick="openLedger('${p.id}')">📊 DETAY</button>
       <a href="https://www.alibaba.com/trade/search?SearchText=${p.q}" target="_blank" class="btn btn-sm btn-orange" style="text-decoration:none">↗ Alibaba</a>
