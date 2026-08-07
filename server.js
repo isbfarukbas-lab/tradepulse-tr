@@ -18,6 +18,7 @@ const EMAIL_TO   = 'isb.faruk.bas@gmail.com';
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
 
 app.use(express.json({ limit: '20mb' }));
+app.use(express.static(path.join(__dirname, 'public'))); // serves manifest, sw.js
 app.use(express.static(__dirname));          // serves index.html
 
 // ── helper: read state ──────────────────────────────────────
@@ -316,7 +317,9 @@ cron.schedule('*/10 * * * *', async () => {
 
 // ════════════════════════════════════════════════════════════
 app.listen(PORT, () => {
-  console.log(`\n🚀 TradePulse TR sunucu başladı → http://localhost:${PORT}`);
+  console.log(`\n🚀 TradePulse TR v3.0 sunucu başladı → http://localhost:${PORT}`);
   console.log(`   Veri dosyası : ${STATE_FILE}`);
-  console.log(`   Cron 09:00   : Günlük rapor maili AKTIF\n`);
+  console.log(`   Cron 09:00   : Günlük rapor maili AKTIF`);
+  console.log(`   Modüller     : Dashboard · Canlı Tarama · Top10 · Arşiv · Analitik · Stok · Rakip · Listeleme · Ayarlar`);
+  console.log(`   PWA          : Service Worker + Manifest aktif\n`);
 });
