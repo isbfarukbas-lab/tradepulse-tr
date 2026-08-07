@@ -1190,6 +1190,61 @@ function updateTicker(p) {
   if (mainEl) mainEl.textContent = `Son: ${p.title} | Skor: ${p.score}/100 | Kâr: ₺${(p.netProfit||0).toLocaleString()}`;
 }
 
+// ============================================================
+// UI FUNCTIONS - CORE
+// ============================================================
+function goTab(tab) {
+  ["top10","live","archive","charts"].forEach(t => {
+    const viewEl = document.getElementById("v-"+t);
+    const tabEl = document.getElementById("t-"+t);
+    if (viewEl) viewEl.style.display = t===tab ? "block" : "none";
+    if (tabEl) tabEl.classList.toggle("on", t===tab);
+  });
+  if (tab === "charts") {
+    renderCharts();
+  }
+}
+
+function toggleScan() {
+  isScanning = !isScanning;
+  const btn = document.getElementById("btn-pause");
+  btn.textContent = isScanning ? "⏸️ Duraklat" : "▶️ Başlat";
+  document.getElementById("bot-status").textContent = isScanning ? "🤖 YZ MOTORİ ÇALIŞIYOR..." : "⏸️ TARAMA DURAKLATILDI";
+}
+
+function openModal(id) {
+  document.getElementById("m-"+id).classList.add("on");
+}
+function closeModal(id) {
+  document.getElementById("m-"+id).classList.remove("on");
+}
+
+function highlightCat(cat) {
+  document.querySelectorAll(".chip").forEach(c => {
+    c.classList.toggle("active-chip", c.dataset.cat === cat);
+  });
+}
+
+// CLOCK
+setInterval(() => {
+  const clockEl = document.getElementById("clock");
+  if (clockEl) clockEl.textContent = new Date().toLocaleTimeString('tr-TR');
+}, 1000);
+
+// TCMB rate display on load
+(function() {
+  const el = document.getElementById("dolar-badge");
+  if (el) el.innerHTML = `💵 $1 = ₺${USD_RATE.toFixed(2)} <span style="font-size:.65rem;color:#64748b">(TCMB)</span>`;
+})();
+
+// 09:00 auto email check
+setInterval(() => {
+  const now = new Date();
+  if (now.getHours() === 9 && now.getMinutes() === 0 && now.getSeconds() < 3) {
+    sendMail();
+  }
+}, 1000);
+
 function openRfq(title, fob, q) {
   document.getElementById("rfq-area").value = `Dear Supplier Sales Manager,
 
