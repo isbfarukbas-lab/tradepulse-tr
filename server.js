@@ -265,7 +265,19 @@ app.get('/api/live-check', async (req, res) => {
   });
 });
 
-
+// POST /api/extension-push  — Chrome Eklentisi Webhook (Mock)
+app.post('/api/extension-push', (req, res) => {
+  try {
+    const { product, token } = req.body;
+    if (token !== 'TRDP-V4-98F2-AX55') {
+      return res.status(401).json({ error: 'Geçersiz Eklenti Anahtarı' });
+    }
+    console.log(`[EXTENSION] Yeni ürün geldi: ${product?.title}`);
+    res.json({ ok: true, message: 'Ürün TradePulse YZ motoruna başarıyla aktarıldı' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // ════════════════════════════════════════════════════════════
 //  CRON JOBS
